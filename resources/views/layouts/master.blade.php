@@ -222,7 +222,7 @@
       <!-- ChartJS 1.0.1 -->
       <script src="{{ asset('assets/themes/limitless/js/custom.js') }}"></script>
       <script
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDJYGsppHU_r_BjvfYFw-lwaQsbPqVV2zw&language=en">
+        src="https://maps.googleapis.com/maps/api/js?key=your_key&language=en">
       </script>
       <script src="{{ asset('assets/new_theme/vendors/datatables.net/jquery.dataTables.js') }}"></script>
       <script src="{{ asset('assets/new_theme/vendors/datatables.net-bs4/dataTables.bootstrap4.js') }}"></script>
