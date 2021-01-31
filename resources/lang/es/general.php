@@ -8,6 +8,11 @@
 return [
     //version 1.0 languages
     //universal words
+    'cannot_access' => "Can't access right now",
+    
+    
+    
+    
     'whatsapp_enabled' => 'Send Whatsapp Enable',
     'whatsapp' => 'WhatsApp',
     'instance' => 'Whatsapp Instance',
@@ -252,8 +257,7 @@ return [
     'recur_starts' => 'Inicio recurrente',
     'recur_ends' => 'Final recurrente',
     'view_modify' => 'Visualizar/Modificar',
-    'template' => 'Template|Templates',
-    'employee' => 'Empleado',
+    'template' => 'Template|Templates',    
     'net_pay_distribution' => 'Distribución de pago neto',
     'bank' => 'Banco',
     'account' => 'Cuenta|Cuentas',
@@ -321,12 +325,12 @@ return [
     'Prof' => 'PROFESOR ',
     'Rev' => 'OTROS ',
     'numbers_only' => 'Solo numeros',
-    'Employee' => 'Empleado Privado',
+    'Employee' => 'Empleado',
     'Owner' => 'Propietario de Negocio',
     'Student' => 'Estudiante',
     'Overseas Worker' => 'Extranjero',
     'Pensioner' => 'Pensionado',
-    'Unemployed' => 'Ex-empleado',
+    'Unemployed' => 'Desempleado',
     //settings words
     'setting' => 'Configuracion|Configuracion',
     'general' => 'General',
@@ -558,7 +562,7 @@ return [
     'closed' => 'Cerrados',
     'withdrawn' => 'Retirados',
     'withdraw' => 'Retirado',
-    'disbursed' => 'Desembolsados',
+    'disbursed' => 'Activos',
     'expected' => 'Expectativa',
     'first_payment_date_optional' => 'Si deja en blanco la primera fecha de pago, el sistema determinará el primer pago según la fecha de desembolso',
     'loan_decimal_msg' => 'El número de decimales en los que desea que se redondee cada cuota de préstamo',

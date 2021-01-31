@@ -1,64 +1,87 @@
 @extends('layouts.master')
 @section('title')
-{{trans_choice('general.expense',2)}}
+Tcobro web | Gastos
 @endsection
 @section('content')
+        @if(Sentinel::hasAccess('expenses.create'))
+            <p align="right"><a href="{{ url('expense/create') }}" type="button" class="btn btn-primary mr-2">Crear Gasto</a></p>
+        @endif
 <div class="card">
   <div class="card-body">
     <div class="panel-heading">
-      <h2 class="panel-title">{{trans_choice('general.expense',2)}}</h2>
-
-      <div class="heading-elements">
-        @if(Sentinel::hasAccess('expenses.create'))
-        <a href="{{ url('expense/create') }}" class="btn btn-info btn-sm">{{trans_choice('general.add',1)}}
-          {{trans_choice('general.expense',2)}}</a>
-        @endif
-      </div>
-    </div>
+      <h4>Gastos</h2>
+     </div>
     <div class="panel-body">
       <div class="table-responsive">
         <table id="order-listing" class="table">
           <thead>
             <tr>
-              <th>Categoria</th>
-              <th>Montos</th>
-              <th>Fecha</th>
-              <th>Recurrente</th>
-              <th>Descripcion</th>
-              <th>{{trans_choice('general.file',2)}}</th>
-              <th>{{ trans_choice('general.action',1) }}</th>
+              <th><center>Fecha</center></th>   
+              <th><center>Gasto</center></th>              
+              <th><center>Monto</center></th>              
+
+
+              <th><center>Recurrente</center></th>
+              <th><center>Descripcion</center></th>
+              <!---<th><center>Archivos</center></th>--->
+              <th style="width:12px";><center>Acciones</center></th>
             </tr>
           </thead>
           <tbody>
             @foreach($data as $key)
             <tr>
-              <td>
+            <td>
+                <center>  
+                  {{ $key->date }}
+                </center>  
+            </td>  
+            <td>
+            <center>
                 @if(!empty($key->expense_type))
                 {{$key->expense_type->name}}
                 @endif
-              </td>
-              <td>{{ $key->amount }}</td>
-              <td>{{ $key->date }}</td>
-              <td>
+            </center>
+            </td>            
+            <td>
+                <center>
+                  ${{ number_format($key->amount,2) }}
+                </center>   
+            </td>            
+
+
+
+            <td>
+                <center>    
                 @if($key->recurring==1)
                 {{trans_choice('general.yes',1)}}
                 @else
                 {{trans_choice('general.no',1)}}
                 @endif
-              </td>
-              <td>{{ $key->notes }}</td>
-              <td>
+                </center>              
+            </td>
+            <td>
+                <center>
+                {{ $key->notes }}
+                </center>            
+            </td>
+              <!---<td>
                 <ul class="">
                   @foreach(unserialize($key->files) as $k=>$value)
                   <li><a href="{!!asset('uploads/'.$value)!!}" target="_blank">{!! $value!!}</a></li>
                   @endforeach
                 </ul>
-              </td>
+              </td>--->
               <td>
-                <a href="{{ url('expense/'.$key->id.'/edit') }}"><img
-                    src="https://img.icons8.com/cute-clipart/64/000000/edit.png" /></a>
-                <a href="{{ url('expense/'.$key->id.'/delete') }}"><img
-                    src="https://img.icons8.com/flat_round/64/000000/delete-sign.png" /></a>
+                <a href="{{ url('expense/'.$key->id.'/edit') }}">
+                        <button style="width:110px; height:28px; background-color:#4c82c3; border-color:#4c82c3;" type="button" class="btn btn-info btn-icon-text">
+                            Editar
+                        </button> 
+                </a>
+                <a href="{{ url('expense/'.$key->id.'/delete') }}" class="delete">
+                     <button style="width:110px; height: 28px; background-color:#de3501; border-color:#de3501;"  type="button" class="btn btn-danger btn-icon-text">
+                        Eliminar
+                      </button>
+                    </a>
               </td>
             </tr>
             @endforeach

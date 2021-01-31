@@ -1,27 +1,26 @@
 @extends('layouts.master')
 @section('title')
-{{ trans_choice('general.user',2) }}
+Tcobro Web | Base
 @endsection
 @section('content')
 <p align="right"><a href="{{ url('baseuser/create') }}" type="button" class="btn btn-primary mr-2">Crear Base</a></p>
 <div class="card">
   <div class="card-body">
-    <h2>Base</h2>
-    <br>
-    <br>
+    <h4>Base</h4>
     <div class="row">
       <div class="col-12">
         <div class="table-responsive">
           <table id="order-listing" class="table">
             <thead>
               <tr>
-                <th>#</th>
-                <th>Date</th>
-                <th>Route</th>
-                <th>User</th>
-                <th>Amount</th>
-                <th>Status</th>
-                <th>Action</th>
+                <th style="width:5px";><center>#       </center></th>
+                <th><center>Fecha   </center></th>
+                <th><center>Ruta    </center></th>
+                <th><center>Cobrador</center></th>
+                <th><center>Monto   </center></th>
+                <th><center>Notas </center></th>
+                <th><center>Estatus </center></th>
+                <th style="width:12px";><center>Accion</th>
               </tr>
             </thead>
             <tbody>
@@ -30,23 +29,43 @@
               @endphp
               @foreach($bases as $base)
               <tr>
-                <td>{{$key}}</td>
-                <td>{{$base->create_at}}</td>
-                <td>{{$base->route_name}}</td>
-                <td>{{$base->first_name}} {{$base->last_name}}</td>
-                <td>$ {{ number_format($base->amount,2) }}</td>
+                <td><center>{{$key}}                            </center></td>
+                <td><center>{{$base->create_at}}                </center></td>
+                <td>{{$base->route_name}}                       </td>
+                <td>{{$base->first_name}} {{$base->last_name}}  </td>
+                <td>$ {{ number_format($base->amount,2) }}      </td>
+                <td>{{$base->note}}                             </td>   
                 <td>
-                  @if ($base->stauts == 1)
-                  <label style="width: 100px;" class="badge badge-info">Activo</label>
+                    <center>
+                <?php    
+                $ahora = date("Y-m-d");
+                $base_a = $base->create_at;
+                $calculo = $ahora > $base_a;
+                ?>
+                  @if($calculo == 1)
+                      <button style="width:110px; height: 28px;" type="button" class="btn btn-warning">
+                        Cerrada
+                      </button> 
                   @else
-                  <label style="width: 100px;" class="badge badge-info">Inactivo</label>
+                    <button style="width:110px; height: 28px; background-color:#00df95; border-color:#00df95;"  type="button" class="btn btn-success btn-icon-text">
+                        Abierta
+                    </button>
                   @endif                  
+                    <center>
                 </td>
+             
                 <td>
-                  <a href="{{ url('baseuser/'.$base->id.'/edit') }}"><img
-                      src="https://img.icons8.com/cute-clipart/64/000000/edit.png" /></a>
-                  <a id="deleteProductId" plan_id="{{$base->id}}"><img
-                      src="https://img.icons8.com/flat_round/64/000000/delete-sign.png" /></a>
+                  <a href="{{ url('baseuser/'.$base->id.'/edit') }}">
+                        <button style="width:110px; height:28px; background-color:#4c82c3; border-color:#4c82c3;" type="button" class="btn btn-info btn-icon-text">
+                            Editar
+                        </button>  
+                      </a>
+                      
+                 <a href="{{url('baseuser/'.$base->id.'/delete')}}" class="delete">
+                     <button style="width:110px; height: 28px; background-color:#de3501; border-color:#de3501;"  type="button" class="btn btn-danger btn-icon-text">
+                        Eliminar
+                      </button>
+                      </a>
                 </td>
               </tr>
               @php
@@ -67,7 +86,7 @@
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
             aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="deleteProductModalLabel">Delete User</h4>
+        <h4 class="modal-title" id="deleteProductModalLabel">Eliminar base</h4>
       </div>
       {!! Form::open(array('url' =>url('baseuser/delete'), 'name'=>'deleteProduct', 'id'=>'deleteProduct',
       'method'=>'post', 'class' => 'form-horizontal', 'enctype'=>'multipart/form-data')) !!}
@@ -75,12 +94,12 @@
       {!! Form::hidden('plan_id', '', array('class'=>'form-control', 'id'=>'plan_id')) !!}
       <div class="modal-body">
         <center>
-          <h5>Are you sure to delete this user?</h5>
+          <h5>Seguro que deseas eliminar este registro?</h5>
         </center>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-        <button type="submit" class="btn btn-primary" id="deleteProduct">Delete</button>
+        <button type="submit" class="btn btn-primary" id="deleteProduct">Eliminar</button>
       </div>
       {!! Form::close() !!}
     </div>

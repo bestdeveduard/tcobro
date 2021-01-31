@@ -1,39 +1,34 @@
 @extends('layouts.master')
 @section('title')
-Collectors
+Tcobro | Permisos
 @endsection
 @section('content')
+
+    {!! Form::open(array('url' => 'user/collector/role/'.$id.'/update','class'=>'',"enctype" => "multipart/form-data")) !!}
 <div class="card">
   <div class="card-body">
-
-    <h4>Collector permits</h4>
-    {!! Form::open(array('url' => 'user/collector/role/'.$id.'/update','class'=>'',"enctype" => "multipart/form-data")) !!}
+    <h4>Permisos de cobrador</h4> 
+    <br>
     <div class="panel-body">
-      <div class="row">
-        <div class="col-md-12">
-          
-          <div class="form-group">
-            <hr>
-            <h4>{{trans_choice('general.manage',1)}} {{trans_choice('general.permission',2)}}</h4>
-            <div class="col-md-6">
-              <table class="table table-stripped table-hover">
+    <div class="table-responsive">
+      <table class="table table-striped table-condensed table-hover">
                 @foreach($data as $permission)
                 <tr>
                   <td>
                     @if($permission->parent_id==0)
                     <strong>{{$permission->name}}</strong>
                     @else
-                    __ {{$permission->name}}
+                    - {{$permission->name}}
                     @endif
                   </td>
-                  <td>
+                  <td style="display: none;">
                     @if(!empty($permission->description))
                     <i class="fa fa-info" data-toggle="tooltip"
                       data-original-title="{!!  $permission->description!!}"></i>
                     @endif
                   </td>
                   <td>
-                    <input @if(array_key_exists($permission->slug, (array)$permi)) checked="" @endif type="checkbox" data-parent="{{$permission->parent_id}}"
+                    <input class="form-check-input" @if(array_key_exists($permission->slug, (array)$permi)) checked="" @endif type="checkbox" data-parent="{{$permission->parent_id}}"
                     name="permission[]" value="{{$permission->slug}}"
                     id="{{$permission->id}}"
                     class="styled pcheck">
@@ -43,22 +38,20 @@ Collectors
                   </td>
                 </tr>
                 @endforeach
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
+                
+      </table>
     </div>
-    <!-- /.panel-body -->
-    <div class="panel-footer">
-      <div class="heading-elements">
-        <button type="submit" class="btn btn-primary pull-right">{{trans_choice('general.save',1)}}</button>
-      </div>
-    </div>
-    {!! Form::close() !!}
   </div>
-
+  <br>
+     <button style="width:115px;" type="submit" class="btn btn-primary mr-2">Confirmar</button>
+     <a style="width:115px;" class="btn btn-light" href="{{ url('user/collector/data') }}">Cancelar</a>    
+</div>  
 </div>
+
+ 
+    <!-- /.panel-body -->
+    {!! Form::close() !!}
+
 
 
 <script>

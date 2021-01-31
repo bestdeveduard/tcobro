@@ -43,7 +43,7 @@ class ExpenseController extends Controller
             Flash::warning("Permission Denied");
             return redirect('/');
         }
-        $data = Expense::where('branch_id', session('branch_id'))->get();
+        $data = Expense::where('branch_id', Sentinel::getUser()->business_id)->get();
 
         return view('expense.data', compact('data'));
     }
@@ -111,7 +111,7 @@ class ExpenseController extends Controller
         $expense->expense_type_id = $request->expense_type_id;
         $expense->amount = $request->amount;
         $expense->notes = $request->notes;
-        $expense->branch_id = session('branch_id');
+        $expense->branch_id = Sentinel::getUser()->business_id;
         $expense->date = $request->date;
         $date = explode('-', $request->date);
         $expense->recurring = $request->recurring;
@@ -176,6 +176,7 @@ class ExpenseController extends Controller
             $journal->expense_id = $expense->id;
             $journal->credit = $request->amount;
             $journal->reference = $expense->id;
+            $journal->branch_id = Sentinel::getUser()->business_id;
             $journal->save();
         } else {
             //alert admin that no account has been set
@@ -192,6 +193,7 @@ class ExpenseController extends Controller
             $journal->expense_id = $expense->id;
             $journal->debit = $request->amount;
             $journal->reference = $expense->id;
+            $journal->branch_id = Sentinel::getUser()->business_id;
             $journal->save();
         } else {
             //alert admin that no account has been set
@@ -277,6 +279,8 @@ class ExpenseController extends Controller
         $expense->date = $request->date;
         $date = explode('-', $request->date);
         $expense->recurring = $request->recurring;
+        $expense->branch_id = Sentinel::getUser()->business_id;
+        
         if ($request->recurring == 1) {
             $expense->recur_frequency = $request->recur_frequency;
             $expense->recur_start_date = $request->recur_start_date;
@@ -328,6 +332,7 @@ class ExpenseController extends Controller
             $journal->expense_id = $expense->id;
             $journal->credit = $request->amount;
             $journal->reference = $expense->id;
+            $journal->branch_id = Sentinel::getUser()->business_id;
             $journal->save();
         } else {
             //alert admin that no account has been set
@@ -344,6 +349,7 @@ class ExpenseController extends Controller
             $journal->expense_id = $expense->id;
             $journal->debit = $request->amount;
             $journal->reference = $expense->id;
+            $journal->branch_id = Sentinel::getUser()->business_id;
             $journal->save();
         } else {
             //alert admin that no account has been set

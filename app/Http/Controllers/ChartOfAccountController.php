@@ -30,7 +30,8 @@ class ChartOfAccountController extends Controller
             Flash::warning("Permission Denied");
             return redirect('/');
         }
-        $data = ChartOfAccount::where('parent_id', Sentinel::getUser()->business_id)->get();
+        $data = ChartOfAccount::all();
+        //$data = ChartOfAccount::where('parent_id', Sentinel::getUser()->business_id)->get();
         return view('chart_of_account.data', compact('data'));
     }
 

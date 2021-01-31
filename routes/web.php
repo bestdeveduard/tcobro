@@ -10,6 +10,8 @@
 |
 */
 //route model binding
+use Illuminate\Support\Facades\DB;
+
 Route::model('custom_field', 'App\Models\CustomField');
 Route::model('borrower', 'App\Models\Borrower');
 Route::model('setting', 'App\Models\Setting');
@@ -89,15 +91,28 @@ Route::get('/config-cache', function () {
 Route::group(['prefix' => 'api'], function () {
     Route::post('homedata', 'ApiController@dashboard');
     Route::post('loginadmin', 'ApiController@loginAdmin');
-    Route::post('login', 'ApiController@login');
+    Route::get('getCountries', 'ApiController@getCountries');
     Route::post('register', 'ApiController@register');
-    Route::get('getRoutes', 'ApiController@getRoutes');
+    Route::post('updateCustomer', 'ApiController@updateCustomer');
+    Route::post('getRoutes', 'ApiController@getRoutes');
+    Route::post('getRouteForCollector', 'ApiController@getRouteForCollector');
+    Route::post('getBorrowers', 'ApiController@getBorrowers');
     Route::get('getAllLoans', 'ApiController@getAllLoans');
     Route::post('getLoans', 'ApiController@getLoans');
+    Route::post('getTransactionsOfDay', 'ApiController@getTransactionsOfDay');
+    Route::post('getTransactionsByLoanId', 'ApiController@getTransactionsByLoanId');
+    Route::post('getLoanById', 'ApiController@getLoanById');
+    Route::post('getLoanHistoryOfBorrower', 'ApiController@getLoanHistoryOfBorrower');
+    Route::post('makeNewLoan', 'ApiController@makeNewLoan');
+    Route::post('getLoanReport', 'ApiController@getLoanReport');
+    Route::post('getGeneralReportForChart', 'ApiController@getGeneralReportForChart');
+    Route::get('getRepaymentMethod', 'ApiController@getRepaymentMethod');
+    Route::post('addCommentData', 'ApiController@addCommentData');
     Route::post('saveRepayment', 'ApiController@saveRepayment');
     Route::post('profileUpdate', 'ApiController@profileUpdate');
-    Route::post('getRecipeId', 'ApiController@getRecipeId');
-    Route::post('getLoanById', 'ApiController@getLoanById');
+
+    
+    Route::post('getRecipeId', 'ApiController@getRecipeId');    
     Route::post('getRepaymentReportOfDaily', 'ApiController@getRepaymentReportOfDaily');
     Route::post('getDistributionData', 'ApiController@getDistributionData');
     Route::post('getLoansReportData', 'ApiController@getLoansReportData');
@@ -119,7 +134,7 @@ Route::group(['prefix' => 'super_admin'], function () {
     Route::post('makeplan', 'SuperAdminController@makePlan');
     Route::get('{id}/editplan', 'SuperAdminController@editPlan');
     Route::post('updateplan', 'SuperAdminController@updatePlan');
-    Route::post('deleteplan', 'SuperAdminController@deletePlan');
+    Route::get('{id}/deleteplan', 'SuperAdminController@deletePlan');
 });
 
 Route::get('/', 'HomeController@index');
@@ -155,6 +170,15 @@ Route::get('no_branch', [
 Route::get('dashboard', [
     'middleware' => ['sentinel', 'branch'],
     function () {
+
+        $role_id = DB::table('roles')->where('name', 'Collector')->first()->id;
+        $super_role_id = DB::table('roles')->where('name', 'Super Administrador')->first()->id;
+        $admin_role_id = DB::table('roles')->where('name', 'Administrador')->first()->id;            
+
+        if (Sentinel::inRole($super_role_id)) {
+            return redirect('super_admin/admin')->send();                
+        }
+
         $loans_released_monthly = array();
         $loan_collections_monthly = array();
         $date = date("Y-m-d");
@@ -178,10 +202,10 @@ Route::get('dashboard', [
                     'repayment')->where('reversed', 0)->where('year',
                     $d[0])->where('month',
                     $d[1])->where('branch_id',
-                    session('branch_id'))->sum('credit');
+                    Sentinel::getUser()->business_id)->sum('credit');
             foreach (\App\Models\Loan::select("loan_schedules.principal", "loan_schedules.interest", "loan_schedules.penalty",
                 "loan_schedules.fees")->where('loans.branch_id',
-                session('branch_id'))->whereIn('loans.status',
+                Sentinel::getUser()->business_id)->whereIn('loans.status',
                 ['disbursed', 'closed', 'written_off'])->join('loan_schedules', 'loans.id', '=',
                 'loan_schedules.loan_id')->where('loan_schedules.deleted_at', NULL)->where('loan_schedules.year',
                 $d[0])->where('loan_schedules.month',
@@ -210,68 +234,62 @@ Route::get('dashboard', [
         $loan_statuses = [];
         array_push($loan_statuses, array(
             'label' => trans_choice('general.pending', 1),
-            'value' => \App\Models\Loan::where('status', 'pending')->count(),
+            'value' => \App\Models\Loan::where('status', 'pending')->where('branch_id', Sentinel::getUser()->business_id)->count(),
             'color' => "#FF8A65",
             'highlight' => "#FF8A65",
             'link' => url('loan/data?status=pending'),
             'class' => "warning-300",
-
         ));
         array_push($loan_statuses, array(
             'label' => trans_choice('general.approved', 1),
-            'value' => \App\Models\Loan::where('status', 'approved')->count(),
+            'value' => \App\Models\Loan::where('status', 'approved')->where('branch_id', Sentinel::getUser()->business_id)->count(),
             'color' => "#64B5F6",
             'highlight' => "#64B5F6",
             'link' => url('loan/data?status=approved'),
             'class' => "primary-300",
-
         ));
 
         array_push($loan_statuses, array(
             'label' => trans_choice('general.disbursed', 1),
-            'value' => \App\Models\Loan::where('status', 'disbursed')->count(),
+            'value' => \App\Models\Loan::where('status', 'disbursed')->where('branch_id', Sentinel::getUser()->business_id)->count(),
             'color' => "#1565C0",
             'highlight' => "#1565C0",
             'link' => url('loan/data?status=disbursed'),
             'class' => "primary-800",
-
         ));
         array_push($loan_statuses, array(
             'label' => trans_choice('general.rescheduled', 1),
-            'value' => \App\Models\Loan::where('status', 'rescheduled')->count(),
+            'value' => \App\Models\Loan::where('status', 'rescheduled')->where('branch_id', Sentinel::getUser()->business_id)->count(),
             'color' => "#00ACC1",
             'highlight' => "#00ACC1",
             'link' => url('loan/data?status=rescheduled'),
             'class' => "info-600",
-
         ));
         array_push($loan_statuses, array(
             'label' => trans_choice('general.written_off', 1),
-            'value' => \App\Models\Loan::where('status', 'written_off')->count(),
+            'value' => \App\Models\Loan::where('status', 'written_off')->where('branch_id', Sentinel::getUser()->business_id)->count(),
             'color' => "#D32F2F",
             'highlight' => "#D32F2F",
             'link' => url('loan/data?status=written_off'),
             'class' => "danger-700",
-
         ));
         array_push($loan_statuses, array(
             'label' => trans_choice('general.declined', 1),
-            'value' => \App\Models\Loan::where('status', 'declined')->count(),
+            'value' => \App\Models\Loan::where('status', 'declined')->where('branch_id', Sentinel::getUser()->business_id)->count(),
             'color' => "#EF5350",
             'highlight' => "#EF5350",
             'link' => url('loan/data?status=declined'),
             'class' => "danger-400",
-
         ));
         array_push($loan_statuses, array(
             'label' => trans_choice('general.closed', 1),
-            'value' => \App\Models\Loan::where('status', 'closed')->count(),
+            'value' => \App\Models\Loan::where('status', 'closed')->where('branch_id', Sentinel::getUser()->business_id)->count(),
             'color' => "#66BB6A",
             'highlight' => "#66BB6A",
             'link' => url('loan/data?status=closed'),
             'class' => "success-400",
-
         ));
+
         $monthly_actual_expected_data = json_encode($monthly_actual_expected_data);
         $monthly_disbursed_loans_data = json_encode($monthly_disbursed_loans_data);
         $loan_statuses = json_encode($loan_statuses);
@@ -301,6 +319,9 @@ Route::group(['prefix' => 'borrower'], function () {
     Route::get('pending', 'BorrowerController@pending');
     Route::get('create', 'BorrowerController@create');
     Route::post('store', 'BorrowerController@store');
+    Route::any('download_report', 'BorrowerController@download_report');
+    Route::any('download_excel', 'BorrowerController@download_excel');
+    Route::any('upload_excel', 'BorrowerController@upload_excel');
     Route::get('{borrower}/show', 'BorrowerController@show');
     Route::get('{borrower}/edit', 'BorrowerController@edit');
     Route::post('{id}/update', 'BorrowerController@update');
@@ -329,7 +350,7 @@ Route::group(['prefix' => 'baseuser'], function () {
     Route::post('store', 'BaseController@store');
     Route::get('{id}/edit', 'BaseController@edit');
     Route::post('update', 'BaseController@update');
-    Route::post('delete', 'BaseController@delete');
+    Route::get('{id}/delete', 'BaseController@delete');
 });
 //route for guarantors
 Route::group(['prefix' => 'guarantor'], function () {
@@ -394,7 +415,7 @@ Route::group(['prefix' => 'user'], function () {
     Route::post('collector/store', 'UserController@storeCollector');
     Route::get('collector/{user}/edit', 'UserController@editCollector');
     Route::post('collector/{id}/update', 'UserController@updateCollector');
-    Route::post('collector/delete', 'UserController@deleteCollector');
+    Route::get('collector/{id}/delete', 'UserController@deleteCollector');
     Route::get('collector/{id}/role', 'UserController@collectorRole');
     Route::post('collector/role/{id}/update', 'UserController@updateCollectorRole');
 
@@ -658,6 +679,7 @@ Route::group(['prefix' => 'report'], function () {
     Route::any('financial_report', 'ReportController@financial_report');
     Route::any('company_report', 'ReportController@company_report');
     Route::any('savings_report', 'ReportController@savings_report');
+
     Route::group(['prefix' => 'financial_report'], function () {
         Route::any('trial_balance', 'ReportController@trial_balance');
         Route::any('trial_balance/pdf', 'ReportController@trial_balance_pdf');
@@ -679,6 +701,7 @@ Route::group(['prefix' => 'report'], function () {
         Route::any('provisioning/excel', 'ReportController@provisioning_excel');
         Route::any('provisioning/csv', 'ReportController@provisioning_csv');
     });
+
     Route::group(['prefix' => 'loan_report'], function () {
         Route::any('expected_repayments', 'ReportController@expected_repayments');
         Route::any('expected_repayments/pdf', 'ReportController@expected_repayments_pdf');
@@ -701,8 +724,8 @@ Route::group(['prefix' => 'report'], function () {
         Route::any('disbursed_loans/excel', 'ReportController@disbursed_loans_excel');
         Route::any('disbursed_loans/csv', 'ReportController@disbursed_loans_csv');
         Route::any('cash_flow', 'ReportController@cash_flow');
-
     });
+
     Route::group(['prefix' => 'borrower_report'], function () {
         Route::any('borrower_numbers', 'ReportController@borrower_numbers');
         Route::any('borrower_numbers/pdf', 'ReportController@borrower_numbers_pdf');
@@ -716,9 +739,8 @@ Route::group(['prefix' => 'report'], function () {
         Route::any('borrowers_overview/pdf', 'ReportController@borrowers_overview_pdf');
         Route::any('borrowers_overview/excel', 'ReportController@borrowers_overview_excel');
         Route::any('borrowers_overview/csv', 'ReportController@borrowers_overview_csv');
-
-
     });
+
     Route::group(['prefix' => 'company_report'], function () {
         Route::any('products_summary', 'ReportController@products_summary');
         Route::any('products_summary/pdf', 'ReportController@products_summary_pdf');
@@ -733,9 +755,8 @@ Route::group(['prefix' => 'report'], function () {
         Route::any('borrowers_overview/pdf', 'ReportController@borrowers_overview_pdf');
         Route::any('borrowers_overview/excel', 'ReportController@borrowers_overview_excel');
         Route::any('borrowers_overview/csv', 'ReportController@borrowers_overview_csv');
-
-
     });
+
     Route::group(['prefix' => 'savings_report'], function () {
         Route::any('savings_transactions', 'ReportController@savings_transactions');
         Route::any('savings_transactions/pdf', 'ReportController@savings_transactions_pdf');
@@ -745,9 +766,8 @@ Route::group(['prefix' => 'report'], function () {
         Route::any('savings_balance/pdf', 'ReportController@savings_balance_pdf');
         Route::any('savings_balance/excel', 'ReportController@savings_balance_excel');
         Route::any('savings_balance/csv', 'ReportController@savings_balance_csv');
-
-
     });
+
     Route::any('cash_flow', 'ReportController@cash_flow');
     Route::any('collection', 'ReportController@collection_report');
     Route::any('loan_product', 'ReportController@profit_loss');

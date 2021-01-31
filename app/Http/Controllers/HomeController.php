@@ -20,13 +20,22 @@ use Illuminate\Http\Request;
 use Cartalyst\Sentinel\Laravel\Facades\Activation;
 use App\Http\Requests;
 use Illuminate\Support\Facades\DB;
+use Lang;
 
 class HomeController extends Controller
 {
     public function __construct()
     {
         if (Sentinel::check()) {
-            return redirect('dashboard')->send();
+            $role_id = DB::table('roles')->where('name', 'Collector')->first()->id;
+            $super_role_id = DB::table('roles')->where('name', 'Super Administrador')->first()->id;
+            $admin_role_id = DB::table('roles')->where('name', 'Administrador')->first()->id;            
+
+            if (Sentinel::inRole($super_role_id)) {
+                return redirect('super_admin/admin')->send();                
+            } else {
+                return redirect('dashboard');
+            }
         }
     }
 
@@ -44,10 +53,14 @@ class HomeController extends Controller
                 return redirect('admin')->send();
             }
         } else {
-            if (Sentinel::inRole('2')) {
-                return redirect('dashboard');
-            } else if (Sentinel::inRole('1')) {
+            $role_id = DB::table('roles')->where('name', 'Collector')->first()->id;
+            $super_role_id = DB::table('roles')->where('name', 'Super Administrador')->first()->id;
+            $admin_role_id = DB::table('roles')->where('name', 'Administrador')->first()->id;
+
+            if (Sentinel::inRole($super_role_id)) {
                 return redirect('super_admin/admin')->send();
+            } else {
+                return redirect('dashboard');
             }
         }
     }
@@ -113,19 +126,32 @@ class HomeController extends Controller
                 "email" => Input::get('email'),
                 "password" => Input::get('password'),
             );
+            
+            $role_id = DB::table('roles')->where('name', 'Collector')->first()->id;
+            $super_role_id = DB::table('roles')->where('name', 'Super Administrador')->first()->id;
+            $admin_role_id = DB::table('roles')->where('name', 'Administrador')->first()->id;
+
+            $log_user = DB::table('users')
+            ->leftJoin('role_users', 'role_users.user_id', '=', 'users.id')
+            ->select('users.id', 'role_users.role_id', 'users.active_status')
+            ->where('email', Input::get('email'))
+            ->get();
+
+            if ($log_user[0]->active_status == 2 || $log_user[0]->role_id == $role_id) {
+                Flash::warning(trans('login.failure'));
+                return redirect()->back()->withInput()->withErrors('Your account is not active yet or you are not admin.');
+            }
+            
             if (!empty(Input::get('remember'))) {
                 //remember me token set
                 if (Sentinel::authenticateAndRemember($credentials)) {
-                    GeneralHelper::audit_trail("Logged in to system");
-                    
-                    if (Sentinel::inRole('2')) {
-                        return redirect('/');
-                    } else if (Sentinel::inRole('1')) {
-                        return redirect('super_admin/admin');
+                    GeneralHelper::audit_trail("Logged in to system");                    
+
+                    if (Sentinel::inRole($super_role_id)) {
+                        return redirect('super_admin/admin')->send();                
                     } else {
                         return redirect('/');
-                    }
-                    
+                    }                    
                 } else {
                     //return back
                     Flash::warning(trans('login.failure'));
@@ -136,10 +162,8 @@ class HomeController extends Controller
                     //logged in, redirect
                     GeneralHelper::audit_trail("Logged in to system");
 
-                    if (Sentinel::inRole('2')) {
-                        return redirect('/');
-                    } else if (Sentinel::inRole('1')) {
-                        return redirect('super_admin/admin');
+                    if (Sentinel::inRole($super_role_id)) {
+                        return redirect('super_admin/admin')->send();                
                     } else {
                         return redirect('/');
                     }
@@ -149,8 +173,6 @@ class HomeController extends Controller
                     return redirect()->back()->withInput()->withErrors('Invalid email or password.');
                 }
             }
-
-
         }
     }
 
@@ -162,7 +184,8 @@ class HomeController extends Controller
             'country_id' => 'required',
             'user_name' => 'required|unique:users',
             'password' => 'required',
-            'rpassword' => 'required|same:password',
+//            'rpassword' => 'required|same:password',
+            'rpassword' => 'required',
             'first_name' => 'required',
             'last_name' => 'required',
         );
@@ -177,45 +200,10 @@ class HomeController extends Controller
             $first_name = Input::get('first_name');
             $last_name = Input::get('last_name');
 
-            // $too      = $email;
-            // $subjecto = "Verify your email address";
-            // $messageo = "Please enter the otp code ".$otp_code." to verify your email address";
-
-            // if (mail($too, $subjecto, $messageo)) {
-            //     $credentials = array(
-            //         "email" => $email,
-            //         "password" => Input::get('password'),
-            //         "first_name" => $first_name,
-            //         "last_name" => $last_name,
-            //         "phone" => Input::get('phone'),
-            //         "country_id" => Input::get('country_id'),
-            //         "user_name" => Input::get('user_name'),
-            //         "otp_code" => $otp_code,
-            //         "otp_status" => '1',
-            //         "active_status" => '2',
-            //         "otp_created" => date('Y-m-d H:i:s')
-            //     );
-            //     $user = Sentinel::registerAndActivate($credentials);
-            //     $role = Sentinel::findRoleByName('Administrador');
-            //     $role->users()->attach($user);
-
-            //     \Session::put('user_id', $user->id);
-            //     $msg = "We sent to you otp code. Check spam or junk mail";
-            //     Flash::warning($msg);
-            //     return redirect('otp_validation')->with('msg', $msg);
-            // } else {
-            //     return redirect()->back()->withInput()->withErrors("Couldn't find your email address");
-            // }            
-            
-            
-
-
-
-            Mail::send('/mail_content/otpmail', ['first_name' => $first_name, 'last_name' => $last_name, 'otp_code' => $otp_code], function($m) {
-                $m->from('admin@tcobro.com', 'T-Cobro');
+            Mail::send('/mail_content/otpmail', ['first_name' => $first_name, 'last_name' => $last_name, 'otp_code' => $otp_code], function($m) use ($email) {
+                $m->from('info@t-cobro.com', 'T-Cobro');
                 $m->to($email)->subject(Lang::get("auth.otpcode"))->getSwiftMessage()
-                ->getHeaders()
-                ->addTextHeader('x-mailgun-native-send', 'true');
+                ->getHeaders();
             });
 
             $credentials = array(
@@ -341,7 +329,8 @@ class HomeController extends Controller
     {
         $rules = array(
             'password' => 'required',
-            'rpassword' => 'required|same:password',
+            
+            'rpassword' => 'required',
         );
         $validator = Validator::make(Input::all(), $rules);
         if ($validator->fails()) {

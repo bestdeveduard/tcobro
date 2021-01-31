@@ -8,6 +8,11 @@
 return [
     //version 1.0 languages
     //universal words
+    'cannot_access' => "No puede acceder en estos momentos",
+    
+    
+    
+    
     'successfully_saved' => 'Successfully Saved',
     'successfully_deleted' => 'Successfully Deleted',
     'validation_error' => 'There was a validation error',

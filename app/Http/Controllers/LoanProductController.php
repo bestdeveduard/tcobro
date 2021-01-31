@@ -41,7 +41,7 @@ class LoanProductController extends Controller
      */
     public function index()
     {
-        $data = LoanProduct::all();
+        $data = LoanProduct::where('user_id', Sentinel::getUser()->business_id)->get();
 
         return view('loan_product.data', compact('data'));
     }
@@ -83,6 +83,12 @@ class LoanProductController extends Controller
         foreach (ChartOfAccount::where('account_type', 'asset')->get() as $key) {
             $chart_assets[$key->id] = $key->name;
         }
+
+        $collectors = array();        
+        foreach ( User::with('roles')->where('business_id', Sentinel::getUser()->business_id)->where('id', '!=', Sentinel::getUser()->id)->get() as $key) {
+            $collectors[$key->id] = $key->first_name.' '.$key->last_name;
+        }
+
         $chart[trans_choice('asset', 2)] = $chart_assets;
         $chart[trans_choice('income', 2)] = $chart_income;
         $chart[trans_choice('liability', 2)] = $chart_liability;
@@ -90,7 +96,7 @@ class LoanProductController extends Controller
         $chart[trans_choice('expense', 2)] = $chart_expenses;
         return view('loan_product.create',
             compact('loan_disbursed_by', 'loan_overdue_penalties', 'chart_expenses', 'chart_income',
-                'chart_liability', 'chart_equity', 'chart_assets', 'chart', 'charges'));
+                'chart_liability', 'chart_equity', 'chart_assets', 'chart', 'charges', 'collectors'));
     }
 
     /**
@@ -103,6 +109,7 @@ class LoanProductController extends Controller
     {
         $loan_product = new LoanProduct();
         $loan_product->name = $request->name;
+        $loan_product->user_id = Sentinel::getUser()->business_id;
 
         if (empty($request->loan_disbursed_by_id)) {
             $loan_product->loan_disbursed_by_id = serialize(array());
@@ -144,6 +151,7 @@ class LoanProductController extends Controller
         $loan_product->chart_receivable_interest_id = $request->chart_receivable_interest_id;
         $loan_product->chart_receivable_fee_id = $request->chart_receivable_fee_id;
         $loan_product->chart_receivable_penalty_id = $request->chart_receivable_penalty_id;
+        $loan_product->user_assigned = $request->collector_id;
         $loan_product->save();
         if (!empty($request->charges)) {
             //loop through the array
@@ -226,6 +234,12 @@ class LoanProductController extends Controller
         foreach (ChartOfAccount::where('account_type', 'asset')->get() as $key) {
             $chart_assets[$key->id] = $key->name;
         }
+
+        $collectors = array();        
+        foreach ( User::with('roles')->where('business_id', Sentinel::getUser()->business_id)->where('id', '!=', Sentinel::getUser()->id)->get() as $key) {
+            $collectors[$key->id] = $key->first_name.' '.$key->last_name;
+        }
+
         $chart[trans_choice('asset', 2)] = $chart_assets;
         $chart[trans_choice('income', 2)] = $chart_income;
         $chart[trans_choice('liability', 2)] = $chart_liability;
@@ -234,7 +248,7 @@ class LoanProductController extends Controller
         return view('loan_product.edit',
             compact('loan_product', 'loan_disbursed_by', 'repayment_order', 'loan_overdue_penalties',
                 'after_maturity_date_penalties', 'chart_expenses', 'chart_income',
-                'chart_liability', 'chart_equity', 'chart_assets', 'chart', 'charges'));
+                'chart_liability', 'chart_equity', 'chart_assets', 'chart', 'charges', 'collectors'));
     }
 
     /**
@@ -248,6 +262,8 @@ class LoanProductController extends Controller
     {
         $loan_product = LoanProduct::find($id);
         $loan_product->name = $request->name;
+        $loan_product->user_id = Sentinel::getUser()->business_id;
+        
         if (empty($request->loan_disbursed_by_id)) {
             $loan_product->loan_disbursed_by_id = serialize(array());
         } else {
@@ -287,6 +303,7 @@ class LoanProductController extends Controller
         $loan_product->chart_receivable_interest_id = $request->chart_receivable_interest_id;
         $loan_product->chart_receivable_fee_id = $request->chart_receivable_fee_id;
         $loan_product->chart_receivable_penalty_id = $request->chart_receivable_penalty_id;
+        $loan_product->user_assigned = $request->collector_id;
         $loan_product->save();
         LoanProductCharge::where('loan_product_id', $loan_product->id)->delete();
         if (!empty($request->charges)) {

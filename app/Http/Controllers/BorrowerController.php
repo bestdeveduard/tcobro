@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Aloha\Twilio\Twilio;
 use App\Helpers\GeneralHelper;
 use App\Models\Borrower;
+use App\Models\BorrowerImport;
 
 use App\Models\Country;
 use App\Models\CustomField;
@@ -21,6 +22,8 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Laracasts\Flash\Flash;
+// use Excel;
+use Maatwebsite\Excel\Facades\Excel;
 
 class BorrowerController extends Controller
 {
@@ -430,5 +433,200 @@ class BorrowerController extends Controller
         GeneralHelper::audit_trail("Reverso cliente en lista negra con ID:" . $id);
         Flash::success(trans('general.successfully_saved'));
         return redirect()->back();
+    }
+
+    public function download_report(Request $request) {
+        $excel_data = [];
+        array_push($excel_data, [
+            "Reporte de clientes ".date('d-m-Y')
+        ]);
+        array_push($excel_data, [
+            "ID",
+            "Nombre y Apellido",
+            "Genero",
+            "Movil",
+            "Email",
+            "ID/Pasaporte",
+            "Estatus",
+            "Calificacion",
+            "Telefono",
+            "Direccion",
+            "Donde labora",
+            "Estatus",
+            "Telefono empresa",
+            "Tiempo laborando",
+            "Ingresos",
+            "Pais",
+            "Referencia",
+            "Telefono",
+            "Coordenadas",
+            "Fecha de creacion"
+        ]);
+        
+        $data = Borrower::where('branch_id', Sentinel::getUser()->business_id)->get();
+
+        foreach($data as $key) {
+            if ($key->gender == "Male") {
+                $gend = "Masculino";
+            } else {
+                $gend = "Femenino";
+            }
+
+            if ($key->active == 0) {
+                $estatus = "Lista negra";
+            } else if (count($key->loans) == 0) {
+                $estatus = "Inactivo";
+            } else if (count($key->loans) > 0) {
+                $estatus = "Activo";
+            } else {
+                $estatus = "";
+            }
+
+            $loanStatus = Loan::where('borrower_id', $key->id)->where('status', 'written_off')->get();
+            if ($key->blacklisted == 1) {
+                $score = '0%';
+            } else if (count($loanStatus) > 0) {
+                $score = '0%';
+            } else {
+                $score = '100%';
+            }
+
+            $country_name = Country::where('id', $key->country_id)->first()->name;
+
+            $date_history = $key->created_at;
+            $timestamp = strtotime($date_history);
+            $fecha_historica = date("d/m/Y", $timestamp);
+            
+            array_push($excel_data, [
+                $key->id,
+                $key->first_name.' '.$key->last_name,
+                $gend,
+                $key->mobile,
+                $key->email,
+                $key->unique_number,
+                $estatus,
+                $score,
+                $key->phone,                
+                $key->address,
+                $key->business_name,
+                trans('general.'.$key->working_status),
+                $key->phone_business,
+                $key->working_time,
+                $key->interesos,
+                $country_name,
+                $key->referencia_1,
+                $key->company_phone,
+                $key->geolocation,
+                $fecha_historica
+            ]);
+        }
+        Excel::create('borrowers_report_'.Sentinel::getUser()->business_id,
+            function ($excel) use ($excel_data) {
+                $excel->sheet('Sheet', function ($sheet) use ($excel_data) {
+                    $sheet->fromArray($excel_data, null, 'A1', false, false);
+                    $sheet->mergeCells('A1:T1');
+                    $sheet->cells('A2:T2', function ($cells) {
+                        $cells->setBackground('#cddaff');
+                        $cells->setAlignment('center');
+                    });
+                    $sheet->getRowDimension(1)->setRowHeight(25);
+                    $sheet->getRowDimension(2)->setRowHeight(20);
+                    // $sheet->row(2, function($row) {                    
+                    //     $row->setBackground('#cddaff');                    
+                    // });
+                });
+            })->download('xls');
+    }
+
+    public function download_excel(Request $request) {
+        $excel_data = [];
+        array_push($excel_data, [
+            "Nombre y Apellido",
+            "Movil",
+            "Email",
+            "ID/Pasaporte",
+            "Telefono",
+            "Direccion",
+            "Donde labora",
+            "Telefono empresa",
+            "Tiempo laborando",
+            "Ingresos",
+            "Referencia",
+            "Telefono Referencia",
+            "Coordenadas"
+        ]);
+        
+        Excel::create('borrowers_template',
+            function ($excel) use ($excel_data) {
+                $excel->sheet('Sheet', function ($sheet) use ($excel_data) {
+                    $sheet->fromArray($excel_data, null, 'A1', false, false);
+                    $sheet->cells('A1:M1', function ($cells) {
+                        $cells->setBackground('#cddaff');
+                        $cells->setAlignment('center');
+                    });
+                    $sheet->getRowDimension(1)->setRowHeight(25);
+                });
+            })->download('xls');
+
+    }
+
+    public function upload_excel(Request $request)
+    {
+        $insert_data = array();
+        
+        $path = $request->file('file');
+        $fname = "borrower_" . uniqid() . '.xls';
+        $path->move(public_path() . '/uploads', $fname);
+
+        $data = Excel::load(public_path().'/uploads/'.$fname)->get();
+
+        if($data->count() > 0) {
+            foreach($data->toArray() as $key => $value)
+            {
+                // echo json_encode($value);
+                if ($value['nombre_y_apellido'] != '' && !empty($value['nombre_y_apellido'])) {
+                    $borrower = new Borrower();
+                    $borrower->first_name = $value['nombre_y_apellido'];
+                    $borrower->last_name = '';
+                    $borrower->user_id = Sentinel::getUser()->id;
+                    $borrower->gender = "Male";
+                    $borrower->country_id = '61';
+                    $borrower->title = 'Mr';
+                    $borrower->branch_id = Sentinel::getUser()->business_id;
+                    $borrower->mobile = $value['movil'];
+                    $borrower->geolocation = $value['coordenadas'];
+                    $borrower->notes = '';
+                    $borrower->email = $value['email'];
+                    $borrower->whatsapp_enabled = '0';
+                    $borrower->phone_business = $value['telefono_empresa'];
+                    $borrower->referencia_1 = $value['referencia'];                
+                    $borrower->unique_number = $value['idpasaporte'];
+                    $borrower->dob = '';
+                    $borrower->address = $value['direccion'];
+                    $borrower->working_time = $value['tiempo_laborando'];
+                    $borrower->ingresos = $value['ingresos'];
+                    $borrower->company_phone = $value['telefono_referencia'];
+                    $borrower->phone = $value['telefono'];
+                    $borrower->business_name = $value['donde_labora'];
+                    $borrower->working_status = "Employee";
+                    $borrower->loan_officers = '';
+                    $date = explode('-', date("Y-m-d"));
+                    $borrower->year = $date[0];
+                    $borrower->month = $date[1];
+                    $files = array();                
+                    $borrower->files = serialize($files);
+                    $borrower->username = '';
+                    
+                    $borrower->save();
+                }
+            }
+
+            Flash::success('Procesado crrectamente');
+            return redirect('borrower/data');
+        } else {
+            Flash::warning('Error, intentar de nuevo');
+            return redirect('borrower/data');
+        }
+        
     }
 }

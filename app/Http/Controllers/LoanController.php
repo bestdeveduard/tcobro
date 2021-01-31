@@ -95,7 +95,7 @@ class LoanController extends Controller
             return redirect('/');
         }
         $borrowers = array();
-        foreach (Borrower::all() as $key) {
+        foreach (Borrower::where('branch_id', Sentinel::getUser()->business_id)->get() as $key) {
             $borrowers[$key->id] = $key->first_name . ' ' . $key->last_name . '(' . $key->unique_number . ')';
         }
         $users = [];
@@ -103,7 +103,7 @@ class LoanController extends Controller
             $users[$key->id] = $key->first_name . ' ' . $key->last_name;
         }
         $loan_products = array();
-        foreach (LoanProduct::all() as $key) {
+        foreach (LoanProduct::where('user_id', Sentinel::getUser()->business_id)->get() as $key) {
             $loan_products[$key->id] = $key->name;
         }
         $loan_disbursed_by = array();
@@ -249,16 +249,30 @@ class LoanController extends Controller
         $loan->user_id = Sentinel::getUser()->id;
         $loan->loan_product_id = $request->loan_product_id;
         $loan->day_payment = $request->day_payment;
-        $loan->penalty_status = $request->penalty_status;        
+        $loan->penalty_status = $request->penalty_status;
         $loan->release_date = $request->release_date;
         $date = explode('-', $request->release_date);
+
+//FUSION PASOS
+        $loan->status = 'approved';
+        $loan->approved_date = $request->release_date;
+        $loan->approved_notes = '';
+        $loan->approved_by_id = Sentinel::getUser()->id;
+        $loan->approved_amount = $request->principal;
+        
+        
         $loan->month = $date[1];
         $loan->year = $date[0];
         
         if (!empty($request->first_payment_date)) {
             $loan->first_payment_date = $request->first_payment_date;
         }
-        $loan->description = $request->description;
+        if (!empty($request->description)) {
+            $loan->description = $request->description;
+        } else {
+            $loan->description = '';
+        }
+        
         
         if(isset($request->includes_sun)) {
             $loan->includes_sun = 1;
@@ -374,7 +388,27 @@ class LoanController extends Controller
                 'Y-m-d');
         }
         $loan->save();
-        GeneralHelper::audit_trail("Nuevo préstamo agregado con ID:" . $loan->id);
+        
+        $loan = Loan::find($loan->id);
+        $loan->status = 'approved';
+        $loan->approved_date = date('Y-m-d');
+        $loan->approved_notes = "";
+        $loan->approved_by_id = Sentinel::getUser()->id;
+        $loan->approved_amount = $loan->principal;
+        $loan->principal = $loan->principal;
+        $loan->save();
+
+        $disbursedBy = LoanDisbursedBy::all();
+        $myRequest = new \Illuminate\Http\Request();
+        $myRequest->setMethod('POST');
+        $myRequest->request->add(['first_payment_date' => $request->first_payment_date]);
+        $myRequest->request->add(['disbursed_date' => $request->release_date]);
+        $myRequest->request->add(['disbursed_notes' => '']);
+        $myRequest->request->add(['loan_disbursed_by_id' => $disbursedBy[0]->id]);
+        
+        self::disburse($myRequest, $loan);
+        
+        GeneralHelper::audit_trail("Nuevo préstamo creado y aprobado con ID:" . $loan->id);
         Flash::success(trans('general.successfully_saved'));
         return redirect('loan/data');
     }
@@ -1760,7 +1794,7 @@ class LoanController extends Controller
             return redirect('/');
         }
         $borrowers = array();
-        foreach (Borrower::all() as $key) {
+        foreach (Borrower::where('branch_id', Sentinel::getUser()->business_id)->get() as $key) {
             $borrowers[$key->id] = $key->first_name . ' ' . $key->last_name . '(' . $key->unique_number . ')';
         }
         $users = [];
@@ -1768,7 +1802,7 @@ class LoanController extends Controller
             $users[$key->id] = $key->first_name . ' ' . $key->last_name;
         }
         $loan_products = array();
-        foreach (LoanProduct::all() as $key) {
+        foreach (LoanProduct::where('user_id', Sentinel::getUser()->business_id)->get() as $key) {
             $loan_products[$key->id] = $key->name;
         }
 
@@ -1817,6 +1851,7 @@ class LoanController extends Controller
         $loan->borrower_id = $request->borrower_id;
         $loan->loan_product_id = $request->loan_product_id;
         $loan->loan_officer_id = $request->loan_officer_id;
+        $loan->day_payment = $request->day_payment;
         $loan->release_date = $request->release_date;
         $date = explode('-', $request->release_date);
         $loan->month = $date[1];
@@ -2146,7 +2181,7 @@ public function waiveInterest(Request $request, $loan)
         }
         $loans = array();
         foreach (Loan::whereIn('status',
-            ['disbursed', 'closed', 'written_off'])->get() as $key) {
+            ['disbursed', 'closed', 'written_off'])->where('branch_id', Sentinel::getUser()->business_id)->get() as $key) {
 
             if (!empty($key->borrower)) {
                 $borrower = ' (' . $key->borrower->first_name . ' ' . $key->borrower->last_name . ")";
@@ -2535,7 +2570,7 @@ public function waiveInterest(Request $request, $loan)
         // **********************************************===============================
         GeneralHelper::audit_trail("Pago aplicado a prestamos ID:" . $loan->id);
         Flash::success("Pago procesado con éxito");
-        return redirect('loan/' . $loan->id . '/show');
+        return redirect('loan/data');
 
     }
 
@@ -2861,7 +2896,7 @@ public function waiveInterest(Request $request, $loan)
         }
         GeneralHelper::audit_trail("Pago actualizado del préstamo con ID:" . $loan_transaction->loan_id);
         Flash::success("Pago guardado con éxito");
-        return redirect('loan/' . $loan_transaction->loan_id . '/show');
+        return redirect('loan/data');
 
     }
 

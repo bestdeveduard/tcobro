@@ -343,36 +343,36 @@ class GeneralHelper
     public static function loan_total_interest($id, $date = '')
     {
         if (empty($date)) {
-            return LoanSchedule::where('loan_id', $id)->sum('interest');
+            return LoanSchedule::where('loan_id', $id)->where('branch_id', Sentinel::getUser()->business_id)->sum('interest');
         } else {
-            return LoanSchedule::where('loan_id', $id)->where('due_date', '<=', $date)->sum('interest');
+            return LoanSchedule::where('loan_id', $id)->where('branch_id', Sentinel::getUser()->business_id)->where('due_date', '<=', $date)->sum('interest');
         }
     }
 
     public static function loan_total_interest_waived($id, $date = '')
     {
         if (empty($date)) {
-            return LoanSchedule::where('loan_id', $id)->sum('interest_waived');
+            return LoanSchedule::where('loan_id', $id)->where('branch_id', Sentinel::getUser()->business_id)->sum('interest_waived');
         } else {
-            return LoanSchedule::where('loan_id', $id)->where('due_date', '<=', $date)->sum('interest_waived');
+            return LoanSchedule::where('loan_id', $id)->where('branch_id', Sentinel::getUser()->business_id)->where('due_date', '<=', $date)->sum('interest_waived');
         }
     }
 
     public static function loan_total_principal($id, $date = '')
     {
         if (empty($date)) {
-            return LoanSchedule::where('loan_id', $id)->sum('principal');
+            return LoanSchedule::where('loan_id', $id)->where('branch_id', Sentinel::getUser()->business_id)->sum('principal');
         } else {
-            return LoanSchedule::where('loan_id', $id)->where('due_date', '<=', $date)->sum('principal');
+            return LoanSchedule::where('loan_id', $id)->where('branch_id', Sentinel::getUser()->business_id)->where('due_date', '<=', $date)->sum('principal');
         }
     }
 
     public static function loan_total_fees($id, $date = '')
     {
         if (empty($date)) {
-            return LoanSchedule::where('loan_id', $id)->sum('fees');
+            return LoanSchedule::where('loan_id', $id)->where('branch_id', Sentinel::getUser()->business_id)->sum('fees');
         } else {
-            return LoanSchedule::where('loan_id', $id)->where('due_date', '<=',
+            return LoanSchedule::where('loan_id', $id)->where('branch_id', Sentinel::getUser()->business_id)->where('due_date', '<=',
                 $date)->sum('fees');
         }
     }
@@ -380,9 +380,9 @@ class GeneralHelper
     public static function loan_total_penalty($id, $date = '')
     {
         if (empty($date)) {
-            return LoanSchedule::where('loan_id', $id)->sum('penalty');
+            return LoanSchedule::where('loan_id', $id)->where('branch_id', Sentinel::getUser()->business_id)->sum('penalty');
         } else {
-            return LoanSchedule::where('loan_id', $id)->where('due_date', '<=', $date)->sum('penalty');
+            return LoanSchedule::where('loan_id', $id)->where('branch_id', Sentinel::getUser()->business_id)->where('due_date', '<=', $date)->sum('penalty');
         }
     }
 
@@ -390,10 +390,10 @@ class GeneralHelper
     {
         if (empty($date)) {
             return LoanTransaction::where('loan_id', $id)->where('transaction_type',
-                'repayment')->where('reversed', 0)->sum('credit');
+                'repayment')->where('reversed', 0)->where('branch_id', Sentinel::getUser()->business_id)->sum('credit');
         } else {
             return LoanTransaction::where('loan_id', $id)->where('transaction_type',
-                'repayment')->where('reversed', 0)->where('due_date', '<=', $date)->sum('credit');
+                'repayment')->where('reversed', 0)->where('branch_id', Sentinel::getUser()->business_id)->where('date', '<=', $date)->sum('credit');
         }
 
     }
@@ -425,17 +425,14 @@ class GeneralHelper
     public static function loan_total_due_period($id, $date)
     {
         return (LoanSchedule::where('loan_id', $id)->where('due_date',
-                $date)->sum('penalty') + LoanSchedule::where('loan_id', $id)->where('due_date',
-                $date)->sum('fees') + LoanSchedule::where('loan_id', $id)->where('due_date',
-                $date)->sum('principal') + LoanSchedule::where('loan_id', $id)->where('due_date',
-                $date)->sum('interest') + LoanSchedule::where('loan_id', $id)->where('due_date',
-                $date)->sum('interest_waived'));
+                $date)->where('branch_id', Sentinel::getUser()->business_id)->sum('penalty') + LoanSchedule::where('loan_id', $id)->where('due_date', $date)->where('branch_id', Sentinel::getUser()->business_id)->sum('fees') + LoanSchedule::where('loan_id', $id)->where('due_date', $date)->where('branch_id', Sentinel::getUser()->business_id)->sum('principal') + LoanSchedule::where('loan_id', $id)->where('due_date',
+                $date)->where('branch_id', Sentinel::getUser()->business_id)->sum('interest') + LoanSchedule::where('loan_id', $id)->where('due_date', $date)->where('branch_id', Sentinel::getUser()->business_id)->sum('interest_waived'));
 
     }
 
     public static function loan_total_paid_period($id, $date)
     {
-        return LoanRepayment::where('loan_id', $id)->where('due_date', $date)->sum('amount');
+        return LoanRepayment::where('loan_id', $id)->where('due_date', $date)->where('branch_id', Sentinel::getUser()->business_id)->sum('amount');
 
     }
 
@@ -444,19 +441,19 @@ class GeneralHelper
 
         if (empty($start_date)) {
             $paid = 0;
-            foreach (Loan::whereIn('status', ['disbursed', 'closed', 'written_off'])->get() as $key) {
+            foreach (Loan::whereIn('status', ['disbursed', 'closed', 'written_off'])->where('branch_id', Sentinel::getUser()->business_id)->get() as $key) {
                 $paid = $paid + LoanTransaction::where('loan_id',
                         $key->id)->where('transaction_type',
-                        'repayment')->where('reversed', 0)->sum('credit');
+                        'repayment')->where('reversed', 0)->where('branch_id', Sentinel::getUser()->business_id)->sum('credit');
             }
             return $paid;
         } else {
             $paid = 0;
             foreach (Loan::whereIn('status', ['disbursed', 'closed', 'written_off'])->whereBetween('release_date',
-                [$start_date, $end_date])->get() as $key) {
+                [$start_date, $end_date])->where('branch_id', Sentinel::getUser()->business_id)->get() as $key) {
                 $paid = $paid + LoanTransaction::where('loan_id',
                         $key->id)->where('transaction_type',
-                        'repayment')->where('reversed', 0)->sum('credit');
+                        'repayment')->where('reversed', 0)->where('branch_id', Sentinel::getUser()->business_id)->sum('credit');
             }
             return $paid;
 
@@ -491,10 +488,10 @@ class GeneralHelper
         $fees = 0;
         if (empty($date)) {
             $schedules = $loan->schedules;
-            $payments = LoanRepayment::where('loan_id', $id)->sum('amount');
+            $payments = LoanRepayment::where('loan_id', $id)->where('branch_id', Sentinel::getUser()->business_id)->sum('amount');
         } else {
-            $schedules = LoanSchedule::where('loan_id', $id)->where('due_date', '<=', $date)->get();
-            $payments = LoanRepayment::where('loan_id', $id)->where('due_date', '<=', $date)->sum('amount');
+            $schedules = LoanSchedule::where('loan_id', $id)->where('due_date', '<=', $date)->where('branch_id', Sentinel::getUser()->business_id)->get();
+            $payments = LoanRepayment::where('loan_id', $id)->where('due_date', '<=', $date)->where('branch_id', Sentinel::getUser()->business_id)->sum('amount');
         }
 
         if (!empty($loan->loan_product)) {
@@ -687,7 +684,7 @@ class GeneralHelper
             $principal = 0;
             foreach (Loan::where('branch_id', Sentinel::getUser()->business_id)->whereIn('status',
                 ['disbursed', 'closed', 'written_off'])->get() as $key) {
-                $principal = $principal + LoanSchedule::where('loan_id', $key->id)->sum('principal');
+                $principal = $principal + LoanSchedule::where('loan_id', $key->id)->where('branch_id', Sentinel::getUser()->business_id)->sum('principal');
             }
             return $principal;
         } else {
@@ -751,7 +748,7 @@ class GeneralHelper
         $guarantee=0;
         $allocation = [];
         if (empty($start_date)) {
-            foreach (SavingTransaction::where('savings_id', $id)->where('reversed',0)->get() as $key) {
+            foreach (SavingTransaction::where('savings_id', $id)->where('reversed',0)->where('branch_id', Sentinel::getUser()->business_id)->get() as $key) {
                 if ($key->type == "interest") {
                     $interest = $interest + $key->credit;
                 }
@@ -771,7 +768,7 @@ class GeneralHelper
 
         } else {
             foreach (SavingTransaction::where('savings_id', $id)->where('reversed',0)->whereBetween('date',
-                [$start_date, $end_date])->get() as $key) {
+                [$start_date, $end_date])->where('branch_id', Sentinel::getUser()->business_id)->get() as $key) {
                 if ($key->type == "interest") {
                     $interest = $interest + $key->credit;
                 }

@@ -88,7 +88,7 @@ class ReportController extends Controller
         $end_date = $request->end_date;
         if ($request->isMethod('post')) {
 
-            $data = LoanRepayment::where('branch_id', session('branch_id'))->whereBetween('collection_date',
+            $data = LoanRepayment::where('branch_id', Sentinel::getUser()->business_id)->whereBetween('collection_date',
                 [$start_date, $end_date])->get();
 
         } else {
@@ -176,7 +176,7 @@ class ReportController extends Controller
             //get loans in that period
             $payments = 0;
             $payments_due = 0;
-            foreach (LoanSchedule::where('branch_id', session('branch_id'))->where('year', $d[0])->where('month',
+            foreach (LoanSchedule::where('branch_id', Sentinel::getUser()->business_id)->where('year', $d[0])->where('month',
                 $d[1])->get() as $key) {
                 if (!empty($key->loan)) {
                     if ($key->loan->status == 'disbursed' || $key->loan->status == 'written_off' || $key->loan->status == 'closed') {
@@ -330,10 +330,10 @@ class ReportController extends Controller
                 $dr = 0;
                 $cr = \App\Models\JournalEntry::where('account_id', $key->id)->whereBetween('date',
                     [$start_date, $end_date])->where('branch_id',
-                    session('branch_id'))->sum('credit');
+                    Sentinel::getUser()->business_id)->sum('credit');
                 $dr = \App\Models\JournalEntry::where('account_id', $key->id)->whereBetween('date',
                     [$start_date, $end_date])->where('branch_id',
-                    session('branch_id'))->sum('debit');
+                    Sentinel::getUser()->business_id)->sum('debit');
                 $credit_total = $credit_total + $cr;
                 $debit_total = $debit_total + $dr;
                 array_push($data, [$key->gl_code, $key->name, number_format($dr, 2), number_format($cr, 2)]);
@@ -384,10 +384,10 @@ class ReportController extends Controller
                 $dr = 0;
                 $cr = \App\Models\JournalEntry::where('account_id', $key->id)->whereBetween('date',
                     [$start_date, $end_date])->where('branch_id',
-                    session('branch_id'))->sum('credit');
+                    Sentinel::getUser()->business_id)->sum('credit');
                 $dr = \App\Models\JournalEntry::where('account_id', $key->id)->whereBetween('date',
                     [$start_date, $end_date])->where('branch_id',
-                    session('branch_id'))->sum('debit');
+                    Sentinel::getUser()->business_id)->sum('debit');
                 $credit_total = $credit_total + $cr;
                 $debit_total = $debit_total + $dr;
                 array_push($data, [$key->gl_code, $key->name, number_format($dr, 2), number_format($cr, 2)]);
@@ -467,10 +467,10 @@ class ReportController extends Controller
             foreach (ChartOfAccount::where('account_type', 'income')->orderBy('gl_code', 'asc')->get() as $key) {
                 $cr = \App\Models\JournalEntry::where('account_id', $key->id)->whereBetween('date',
                     [$start_date, $end_date])->where('branch_id',
-                    session('branch_id'))->sum('credit');
+                    Sentinel::getUser()->business_id)->sum('credit');
                 $dr = \App\Models\JournalEntry::where('account_id', $key->id)->whereBetween('date',
                     [$start_date, $end_date])->where('branch_id',
-                    session('branch_id'))->sum('debit');
+                    Sentinel::getUser()->business_id)->sum('debit');
                 $balance = $cr - $dr;
                 $total_income = $total_income + $balance;
                 array_push($data, [$key->gl_code, $key->name, number_format($balance, 2)]);
@@ -488,10 +488,10 @@ class ReportController extends Controller
             foreach (ChartOfAccount::where('account_type', 'expense')->orderBy('gl_code', 'asc')->get() as $key) {
                 $cr = \App\Models\JournalEntry::where('account_id', $key->id)->whereBetween('date',
                     [$start_date, $end_date])->where('branch_id',
-                    session('branch_id'))->sum('credit');
+                    Sentinel::getUser()->business_id)->sum('credit');
                 $dr = \App\Models\JournalEntry::where('account_id', $key->id)->whereBetween('date',
                     [$start_date, $end_date])->where('branch_id',
-                    session('branch_id'))->sum('debit');
+                    Sentinel::getUser()->business_id)->sum('debit');
                 $balance = $dr - $cr;
                 $total_expenses = $total_expenses + $balance;
                 array_push($data, [$key->gl_code, $key->name, number_format($balance, 2)]);
@@ -548,10 +548,10 @@ class ReportController extends Controller
             foreach (ChartOfAccount::where('account_type', 'income')->orderBy('gl_code', 'asc')->get() as $key) {
                 $cr = \App\Models\JournalEntry::where('account_id', $key->id)->whereBetween('date',
                     [$start_date, $end_date])->where('branch_id',
-                    session('branch_id'))->sum('credit');
+                    Sentinel::getUser()->business_id)->sum('credit');
                 $dr = \App\Models\JournalEntry::where('account_id', $key->id)->whereBetween('date',
                     [$start_date, $end_date])->where('branch_id',
-                    session('branch_id'))->sum('debit');
+                    Sentinel::getUser()->business_id)->sum('debit');
                 $balance = $cr - $dr;
                 $total_income = $total_income + $balance;
                 array_push($data, [$key->gl_code, $key->name, number_format($balance, 2)]);
@@ -569,10 +569,10 @@ class ReportController extends Controller
             foreach (ChartOfAccount::where('account_type', 'expense')->orderBy('gl_code', 'asc')->get() as $key) {
                 $cr = \App\Models\JournalEntry::where('account_id', $key->id)->whereBetween('date',
                     [$start_date, $end_date])->where('branch_id',
-                    session('branch_id'))->sum('credit');
+                    Sentinel::getUser()->business_id)->sum('credit');
                 $dr = \App\Models\JournalEntry::where('account_id', $key->id)->whereBetween('date',
                     [$start_date, $end_date])->where('branch_id',
-                    session('branch_id'))->sum('debit');
+                    Sentinel::getUser()->business_id)->sum('debit');
                 $balance = $dr - $cr;
                 $total_expenses = $total_expenses + $balance;
                 array_push($data, [$key->gl_code, $key->name, number_format($balance, 2)]);
@@ -659,10 +659,10 @@ class ReportController extends Controller
             foreach (ChartOfAccount::where('account_type', 'asset')->orderBy('gl_code', 'asc')->get() as $key) {
                 $cr = \App\Models\JournalEntry::where('account_id', $key->id)->where('date', '<=',
                     $start_date)->where('branch_id',
-                    session('branch_id'))->sum('credit');
+                    Sentinel::getUser()->business_id)->sum('credit');
                 $dr = \App\Models\JournalEntry::where('account_id', $key->id)->where('date', '<=',
                     $start_date)->where('branch_id',
-                    session('branch_id'))->sum('debit');
+                    Sentinel::getUser()->business_id)->sum('debit');
                 $balance = $dr - $cr;
                 $total_assets = $total_assets + $balance;
                 array_push($data, [$key->gl_code, $key->name, number_format($balance, 2)]);
@@ -680,10 +680,10 @@ class ReportController extends Controller
             foreach (ChartOfAccount::where('account_type', 'liability')->orderBy('gl_code', 'asc')->get() as $key) {
                 $cr = \App\Models\JournalEntry::where('account_id', $key->id)->where('date', '<=',
                     $start_date)->where('branch_id',
-                    session('branch_id'))->sum('credit');
+                    Sentinel::getUser()->business_id)->sum('credit');
                 $dr = \App\Models\JournalEntry::where('account_id', $key->id)->where('date', '<=',
                     $start_date)->where('branch_id',
-                    session('branch_id'))->sum('debit');
+                    Sentinel::getUser()->business_id)->sum('debit');
                 $balance = $cr - $dr;
                 $total_liabilities = $total_liabilities + $balance;
                 array_push($data, [$key->gl_code, $key->name, number_format($balance, 2)]);
@@ -701,10 +701,10 @@ class ReportController extends Controller
             foreach (ChartOfAccount::where('account_type', 'equity')->orderBy('gl_code', 'asc')->get() as $key) {
                 $cr = \App\Models\JournalEntry::where('account_id', $key->id)->where('date', '<=',
                     $start_date)->where('branch_id',
-                    session('branch_id'))->sum('credit');
+                    Sentinel::getUser()->business_id)->sum('credit');
                 $dr = \App\Models\JournalEntry::where('account_id', $key->id)->where('date', '<=',
                     $start_date)->where('branch_id',
-                    session('branch_id'))->sum('debit');
+                    Sentinel::getUser()->business_id)->sum('debit');
                 $balance = $cr - $dr;
                 $total_equity = $total_equity + $balance;
                 array_push($data, [$key->gl_code, $key->name, number_format($balance, 2)]);
@@ -765,10 +765,10 @@ class ReportController extends Controller
             foreach (ChartOfAccount::where('account_type', 'asset')->orderBy('gl_code', 'asc')->get() as $key) {
                 $cr = \App\Models\JournalEntry::where('account_id', $key->id)->where('date', '<=',
                     $start_date)->where('branch_id',
-                    session('branch_id'))->sum('credit');
+                    Sentinel::getUser()->business_id)->sum('credit');
                 $dr = \App\Models\JournalEntry::where('account_id', $key->id)->where('date', '<=',
                     $start_date)->where('branch_id',
-                    session('branch_id'))->sum('debit');
+                    Sentinel::getUser()->business_id)->sum('debit');
                 $balance = $dr - $cr;
                 $total_assets = $total_assets + $balance;
                 array_push($data, [$key->gl_code, $key->name, number_format($balance, 2)]);
@@ -786,10 +786,10 @@ class ReportController extends Controller
             foreach (ChartOfAccount::where('account_type', 'liability')->orderBy('gl_code', 'asc')->get() as $key) {
                 $cr = \App\Models\JournalEntry::where('account_id', $key->id)->where('date', '<=',
                     $start_date)->where('branch_id',
-                    session('branch_id'))->sum('credit');
+                    Sentinel::getUser()->business_id)->sum('credit');
                 $dr = \App\Models\JournalEntry::where('account_id', $key->id)->where('date', '<=',
                     $start_date)->where('branch_id',
-                    session('branch_id'))->sum('debit');
+                    Sentinel::getUser()->business_id)->sum('debit');
                 $balance = $cr - $dr;
                 $total_liabilities = $total_liabilities + $balance;
                 array_push($data, [$key->gl_code, $key->name, number_format($balance, 2)]);
@@ -807,10 +807,10 @@ class ReportController extends Controller
             foreach (ChartOfAccount::where('account_type', 'equity')->orderBy('gl_code', 'asc')->get() as $key) {
                 $cr = \App\Models\JournalEntry::where('account_id', $key->id)->where('date', '<=',
                     $start_date)->where('branch_id',
-                    session('branch_id'))->sum('credit');
+                    Sentinel::getUser()->business_id)->sum('credit');
                 $dr = \App\Models\JournalEntry::where('account_id', $key->id)->where('date', '<=',
                     $start_date)->where('branch_id',
-                    session('branch_id'))->sum('debit');
+                    Sentinel::getUser()->business_id)->sum('debit');
                 $balance = $cr - $dr;
                 $total_equity = $total_equity + $balance;
                 array_push($data, [$key->gl_code, $key->name, number_format($balance, 2)]);
@@ -854,7 +854,7 @@ class ReportController extends Controller
         $routes_rang = [];
         
         foreach (\App\Models\LoanTransaction::where('transaction_type', 'repayment')->where('reversed', 0)->whereBetween('date',
-        [$start_date, $end_date])->orderBy('user_id')->get() as $key) {
+        [$start_date, $end_date])->where('branch_id', Sentinel::getUser()->business_id)->orderBy('user_id')->get() as $key) {
             if (!in_array($key->user_id, $users_rang)) {
                 array_push($users_rang, $key->user_id);
             }
@@ -872,7 +872,7 @@ class ReportController extends Controller
             foreach ($routes_rang as $rrr => $router) {
 
                 $loan_id_rang = [];
-                foreach (\App\Models\Loan::where('loan_product_id', $router)->get() as $lloan) {
+                foreach (\App\Models\Loan::where('loan_product_id', $router)->where('branch_id', Sentinel::getUser()->business_id)->get() as $lloan) {
                     array_push($loan_id_rang, $lloan->id);
                 }                
                 $route = \App\Models\LoanProduct::where('id', $router)->first();
@@ -884,15 +884,15 @@ class ReportController extends Controller
                 $total_total_data = 0;
                 $pay_count = 0;
 
-                foreach (\App\Models\LoanTransaction::where('transaction_type', 'repayment')->where('reversed', 0)->whereBetween('date', [$start_date, $end_date])->where('user_id', $user_id)->whereIn('loan_id', $loan_id_rang)->get() as $key) {
+                foreach (\App\Models\LoanTransaction::where('transaction_type', 'repayment')->where('reversed', 0)->whereBetween('date', [$start_date, $end_date])->where('user_id', $user_id)->whereIn('loan_id', $loan_id_rang)->where('branch_id', Sentinel::getUser()->business_id)->get() as $key) {
 
-                    $principal = \App\Models\JournalEntry::where('loan_transaction_id', $key->id)->where('reversed',0)->where('name', "Principal Repayment")->sum('credit');
+                    $principal = \App\Models\JournalEntry::where('loan_transaction_id', $key->id)->where('reversed',0)->where('name', "Principal Repayment")->where('branch_id', Sentinel::getUser()->business_id)->sum('credit');
 
-                    $interest = \App\Models\JournalEntry::where('loan_transaction_id', $key->id)->where('reversed',0)->where('name', "Interest Repayment")->sum('credit');
+                    $interest = \App\Models\JournalEntry::where('loan_transaction_id', $key->id)->where('reversed',0)->where('name', "Interest Repayment")->where('branch_id', Sentinel::getUser()->business_id)->sum('credit');
 
-                    $fees = \App\Models\JournalEntry::where('loan_transaction_id', $key->id)->where('reversed',0)->where('name', "Fees Repayment")->sum('credit');
+                    $fees = \App\Models\JournalEntry::where('loan_transaction_id', $key->id)->where('reversed',0)->where('name', "Fees Repayment")->where('branch_id', Sentinel::getUser()->business_id)->sum('credit');
 
-                    $penalty = \App\Models\JournalEntry::where('loan_transaction_id', $key->id)->where('reversed',0)->where('name', "Penalty Repayment")->sum('credit');
+                    $penalty = \App\Models\JournalEntry::where('loan_transaction_id', $key->id)->where('reversed',0)->where('name', "Penalty Repayment")->where('branch_id', Sentinel::getUser()->business_id)->sum('credit');
 
                     $total = \App\Models\LoanTransaction::where('id', $key->id)->where('reversed', 0)->where('transaction_type', "repayment")->sum('credit');
                     
@@ -1075,11 +1075,12 @@ class ReportController extends Controller
             Flash::warning("Permiso Denegado");
             return redirect('/');
         }
+        $data = array();
         $start_date = $request->start_date;
         $end_date = $request->end_date;
         if (!empty($start_date)) {
             $data = LoanTransaction::where('transaction_type',
-                'repayment')->where('reversed', 0)->whereBetween('date',
+                'repayment')->where('reversed', 0)->where('branch_id', Sentinel::getUser()->business_id)->whereBetween('date',
                 [$start_date, $end_date])->get();
         }
         return view('loan_report.repayments_report',
@@ -1098,7 +1099,7 @@ class ReportController extends Controller
         if (!empty($start_date)) {
             $data = LoanTransaction::where('transaction_type',
                 'repayment')->where('reversed', 0)->where('branch_id',
-                session('branch_id'))->whereBetween('date',
+                Sentinel::getUser()->business_id)->whereBetween('date',
                 [$start_date, $end_date])->get();
             $pdf = PDF::loadView('loan_report.repayments_report_pdf', compact('start_date',
                 'end_date', 'data'));
@@ -1142,7 +1143,7 @@ class ReportController extends Controller
             $total_penalty = 0;
             foreach (LoanTransaction::where('transaction_type',
                 'repayment')->where('reversed', 0)->where('branch_id',
-                session('branch_id'))->whereBetween('date',
+                Sentinel::getUser()->business_id)->whereBetween('date',
                 [$start_date, $end_date])->get() as $key) {
                 $principal = JournalEntry::where('loan_transaction_id', $key->id)->where('reversed',
                     0)->where('name', "Principal Repayment")->sum('credit');
@@ -1238,7 +1239,7 @@ class ReportController extends Controller
             $total_penalty = 0;
             foreach (LoanTransaction::where('transaction_type',
                 'repayment')->where('reversed', 0)->where('branch_id',
-                session('branch_id'))->whereBetween('date',
+                Sentinel::getUser()->business_id)->whereBetween('date',
                 [$start_date, $end_date])->get() as $key) {
                 $principal = JournalEntry::where('loan_transaction_id', $key->id)->where('reversed',
                     0)->where('transaction_sub_type', 'repayment_principal')->sum('credit');
@@ -1320,10 +1321,10 @@ class ReportController extends Controller
             //get disbursed loans within specified period and officer
             if ($request->user_id == "-1") {
                 $data = Loan::where('status', 'disbursed')->where('branch_id',
-                    session('branch_id'))->get();
+                    Sentinel::getUser()->business_id)->get();
             } else {
                 $data = Loan::where('loan_officer_id', $request->user_id)->where('branch_id',
-                    session('branch_id'))->where('status', 'disbursed')->get();
+                    Sentinel::getUser()->business_id)->where('status', 'disbursed')->get();
             }
         }
         return view('loan_report.collection_sheet',
@@ -1345,10 +1346,10 @@ class ReportController extends Controller
 
             if ($request->user_id == "-1") {
                 $data = Loan::where('status', 'disbursed')->where('branch_id',
-                    session('branch_id'))->get();
+                    Sentinel::getUser()->business_id)->get();
             } else {
                 $data = Loan::where('loan_officer_id', $request->user_id)->where('branch_id',
-                    session('branch_id'))->where('status', 'disbursed')->get();
+                    Sentinel::getUser()->business_id)->where('status', 'disbursed')->get();
             }
             $pdf = PDF::loadView('loan_report.collection_sheet_pdf', compact('start_date',
                 'end_date', 'user_id', 'data'));
@@ -1371,10 +1372,10 @@ class ReportController extends Controller
         if (!empty($start_date)) {
             if ($request->user_id == "-1") {
                 $ldata = Loan::where('status', 'disbursed')->where('branch_id',
-                    session('branch_id'))->get();
+                    Sentinel::getUser()->business_id)->get();
             } else {
                 $ldata = Loan::where('loan_officer_id', $request->user_id)->where('branch_id',
-                    session('branch_id'))->where('status', 'disbursed')->get();
+                    Sentinel::getUser()->business_id)->where('status', 'disbursed')->get();
             }
             $data = [];
             array_push($data, [
@@ -1489,10 +1490,10 @@ class ReportController extends Controller
         if (!empty($start_date)) {
             if ($request->user_id == "-1") {
                 $ldata = Loan::where('status', 'disbursed')->where('branch_id',
-                    session('branch_id'))->get();
+                    Sentinel::getUser()->business_id)->get();
             } else {
                 $ldata = Loan::where('loan_officer_id', $request->user_id)->where('branch_id',
-                    session('branch_id'))->where('status', 'disbursed')->get();
+                    Sentinel::getUser()->business_id)->where('status', 'disbursed')->get();
             }
             $data = [];
             array_push($data, [
@@ -1602,13 +1603,15 @@ class ReportController extends Controller
             Flash::warning("Permiso Denegado");
             return redirect('/');
         }
-        $start_date = $request->start_date;
-        $end_date = $request->end_date;
-
+        // $start_date = $request->start_date;
+        if (!empty($request->end_date)) {
+            $end_date = $request->end_date;
+        } else {
+            $end_date = date('Y-m-d');
+        }
 
         return view('loan_report.arrears_report',
-            compact('start_date',
-                'end_date', 'data'));
+            compact('end_date'));
     }
 
     public function arrears_report_pdf(Request $request)
@@ -1676,7 +1679,7 @@ class ReportController extends Controller
             $total_penalty = 0;
             $total_amount = 0;
             foreach (Loan::where('first_payment_date', '<=', $end_date)->where('branch_id',
-                session('branch_id'))->where('status', 'disbursed')->orderBy('release_date', 'asc')->get() as $key) {
+                Sentinel::getUser()->business_id)->where('status', 'disbursed')->orderBy('release_date', 'asc')->get() as $key) {
                 $loan_due_items = GeneralHelper::loan_due_items($key->id,
                     $key->release_date, $end_date);
                 $loan_paid_items = GeneralHelper::loan_paid_items($key->id,
@@ -1843,7 +1846,7 @@ class ReportController extends Controller
             $total_penalty = 0;
             $total_amount = 0;
             foreach (Loan::where('first_payment_date', '<=', $end_date)->where('branch_id',
-                session('branch_id'))->where('status', 'disbursed')->orderBy('release_date', 'asc')->get() as $key) {
+                Sentinel::getUser()->business_id)->where('status', 'disbursed')->orderBy('release_date', 'asc')->get() as $key) {
                 $loan_due_items = GeneralHelper::loan_due_items($key->id,
                     $key->release_date, $end_date);
                 $loan_paid_items = GeneralHelper::loan_paid_items($key->id,
@@ -1976,15 +1979,12 @@ class ReportController extends Controller
         $user_id = $request->user_id;
         $loan_product_id = $request->loan_product_id;
         $users = [];
+        $data = [];
         $users["-1"] = trans_choice('general.all', 1);
         foreach (User::all() as $key) {
             $users[$key->id] = $key->first_name . ' ' . $key->last_name;
         }
-        $users = [];
-        $users["-1"] = trans_choice('general.all', 1);
-        foreach (User::all() as $key) {
-            $users[$key->id] = $key->first_name . ' ' . $key->last_name;
-        }
+        
         $loan_products = [];
         $loan_products["-1"] = trans_choice('general.all', 1);
         foreach (LoanProduct::all() as $key) {
@@ -1995,11 +1995,11 @@ class ReportController extends Controller
             if ($request->loan_product_id == "-1") {
                 $data = Loan::whereIn('status',
                     ['disbursed'])->where('branch_id',
-                    session('branch_id'))->whereBetween('release_date',
+                    Sentinel::getUser()->business_id)->whereBetween('release_date',
                     [$start_date, $end_date])->get();
             } else {
                 $data = Loan::where('loan_product_id', $request->loan_product_id)->where('branch_id',
-                    session('branch_id'))->whereIn('status',
+                    Sentinel::getUser()->business_id)->whereIn('status',
                     ['disbursed'])->whereBetween('release_date',
                     [$start_date, $end_date])->get();
             }
@@ -2024,11 +2024,11 @@ class ReportController extends Controller
             if ($request->loan_product_id == "-1") {
                 $ldata = Loan::whereIn('status',
                     ['disbursed'])->where('branch_id',
-                    session('branch_id'))->whereBetween('release_date',
+                    Sentinel::getUser()->business_id)->whereBetween('release_date',
                     [$start_date, $end_date])->get();
             } else {
                 $ldata = Loan::where('loan_product_id', $request->loan_product_id)->where('branch_id',
-                    session('branch_id'))->whereIn('status',
+                    Sentinel::getUser()->business_id)->whereIn('status',
                     ['disbursed'])->whereBetween('release_date',
                     [$start_date, $end_date])->get();
             }
@@ -2153,11 +2153,11 @@ class ReportController extends Controller
         if (!empty($end_date)) {
             if ($request->loan_product_id == "-1") {
                 $ldata = Loan::where('status', 'disbursed')->where('branch_id',
-                    session('branch_id'))->whereBetween('release_date',
+                    Sentinel::getUser()->business_id)->whereBetween('release_date',
                     [$start_date, $end_date])->get();
             } else {
                 $ldata = Loan::where('loan_product_id', $request->loan_product_id)->where('branch_id',
-                    session('branch_id'))->where('status', 'disbursed')->whereBetween('release_date',
+                    Sentinel::getUser()->business_id)->where('status', 'disbursed')->whereBetween('release_date',
                     [$start_date, $end_date])->get();
             }
             $data = [];
@@ -2280,7 +2280,7 @@ class ReportController extends Controller
 
         return view('borrower_report.borrower_numbers',
             compact('start_date',
-                'end_date', 'data'));
+                'end_date'));
     }
 
     public function borrower_numbers_pdf(Request $request)
@@ -2542,7 +2542,7 @@ class ReportController extends Controller
             $total_provisioning_amount = 0;
             $total_amount = 0;
             foreach (Loan::where('release_date', '<=', $end_date)->where('branch_id',
-                session('branch_id'))->where('status', 'disbursed')->orderBy('release_date', 'asc')->get() as $key) {
+                Sentinel::getUser()->business_id)->where('status', 'disbursed')->orderBy('release_date', 'asc')->get() as $key) {
                 $loan_due_items = \App\Helpers\GeneralHelper::loan_due_items($key->id);
                 $loan_due_items_arrears = \App\Helpers\GeneralHelper::loan_due_items($key->id,
                     $key->release_date, $end_date);
@@ -2759,7 +2759,7 @@ class ReportController extends Controller
             $total_provisioning_amount = 0;
             $total_amount = 0;
             foreach (Loan::where('release_date', '<=', $end_date)->where('branch_id',
-                session('branch_id'))->where('status', 'disbursed')->orderBy('release_date', 'asc')->get() as $key) {
+                Sentinel::getUser()->business_id)->where('status', 'disbursed')->orderBy('release_date', 'asc')->get() as $key) {
                 $loan_due_items = \App\Helpers\GeneralHelper::loan_due_items($key->id);
                 $loan_due_items_arrears = \App\Helpers\GeneralHelper::loan_due_items($key->id,
                     $key->release_date, $end_date);
@@ -2918,13 +2918,11 @@ class ReportController extends Controller
             Flash::warning("Permiso Denegado");
             return redirect('/');
         }
+
         $start_date = $request->start_date;
         $end_date = $request->end_date;
 
-
-        return view('company_report.products_summary',
-            compact('start_date',
-                'end_date', 'data'));
+        return view('company_report.products_summary', compact('start_date', 'end_date'));
     }
 
     public function products_summary_pdf(Request $request)
@@ -3012,7 +3010,7 @@ class ReportController extends Controller
                 $outstanding = 0;
                 //loop through loans, this will need to be improved
                 foreach (Loan::where('loan_product_id', $key->id)->where('branch_id',
-                    session('branch_id'))->whereIn('status',
+                    Sentinel::getUser()->business_id)->whereIn('status',
                     ['disbursed', 'closed', 'written_off'])->whereBetween('release_date',
                     [$start_date, $end_date])->get() as $loan) {
                     $disbursed_loans = $disbursed_loans + 1;
@@ -3149,7 +3147,7 @@ class ReportController extends Controller
                 $outstanding = 0;
                 //loop through loans, this will need to be improved
                 foreach (Loan::where('loan_product_id', $key->id)->where('branch_id',
-                    session('branch_id'))->whereIn('status',
+                    Sentinel::getUser()->business_id)->whereIn('status',
                     ['disbursed', 'closed', 'written_off'])->whereBetween('release_date',
                     [$start_date, $end_date])->get() as $loan) {
                     $disbursed_loans = $disbursed_loans + 1;
@@ -3235,14 +3233,14 @@ class ReportController extends Controller
         }
         //loan product pie data
         $loan_product_data = [];
-        foreach (LoanProduct::all() as $key) {
+        foreach (LoanProduct::where('user_id', Sentinel::getUser()->business_id)->get() as $key) {
             if (empty($start_date)) {
                 $count = Loan::where('loan_product_id', $key->id)->where('branch_id',
-                    session('branch_id'))->whereIn('status',
+                Sentinel::getUser()->business_id)->whereIn('status',
                     ['disbursed', 'closed', 'written_off', 'rescheduled'])->count();
             } else {
                 $count = Loan::where('loan_product_id', $key->id)->where('branch_id',
-                    session('branch_id'))->whereIn('status',
+                Sentinel::getUser()->business_id)->whereIn('status',
                     ['disbursed', 'closed', 'written_off', 'rescheduled'])->whereBetween('release_date',
                     [$start_date, $end_date])->count();
             }
@@ -3264,11 +3262,11 @@ class ReportController extends Controller
                 $cr = JournalEntry::where('account_id', $key->id)->where('year',
                     $d[0])->where('month',
                     $d[1])->where('branch_id',
-                    session('branch_id'))->sum('credit');
+                    Sentinel::getUser()->business_id)->sum('credit');
                 $dr = JournalEntry::where('account_id', $key->id)->where('year',
                     $d[0])->where('month',
                     $d[1])->where('branch_id',
-                    session('branch_id'))->sum('debit');
+                    Sentinel::getUser()->business_id)->sum('debit');
                 $balance = $cr - $dr;
                 $total_income = $total_income + $balance;
             }
@@ -3277,11 +3275,11 @@ class ReportController extends Controller
                 $cr = JournalEntry::where('account_id', $key->id)->where('year',
                     $d[0])->where('month',
                     $d[1])->where('branch_id',
-                    session('branch_id'))->sum('credit');
+                    Sentinel::getUser()->business_id)->sum('credit');
                 $dr = JournalEntry::where('account_id', $key->id)->where('year',
                     $d[0])->where('month',
                     $d[1])->where('branch_id',
-                    session('branch_id'))->sum('debit');
+                    Sentinel::getUser()->business_id)->sum('debit');
                 $balance = $dr - $cr;
                 $total_expenses = $total_expenses + $balance;
             }
@@ -3307,7 +3305,7 @@ class ReportController extends Controller
             $count = Borrower::where('year',
                 $d[0])->where('month',
                 $d[1])->where('branch_id',
-                session('branch_id'))->count();
+                Sentinel::getUser()->business_id)->count();
             array_push($monthly_borrower_data, array(
                 'month' => date_format(date_create($loop_date),
                     'M' . ' ' . $d[0]),
@@ -3329,7 +3327,7 @@ class ReportController extends Controller
                 'repayment')->where('reversed', 0)->where('year',
                 $d[0])->where('month',
                 $d[1])->where('branch_id',
-                session('branch_id'))->sum('credit');
+                Sentinel::getUser()->business_id)->sum('credit');
             array_push($monthly_repayments_data, array(
                 'month' => date_format(date_create($loop_date),
                     'M' . ' ' . $d[0]),
@@ -3354,10 +3352,10 @@ class ReportController extends Controller
                     'repayment')->where('reversed', 0)->where('year',
                     $d[0])->where('month',
                     $d[1])->where('branch_id',
-                    session('branch_id'))->sum('credit');
+                    Sentinel::getUser()->business_id)->sum('credit');
             foreach (Loan::select("loan_schedules.principal", "loan_schedules.interest", "loan_schedules.penalty",
                 "loan_schedules.fees")->where('loans.branch_id',
-                session('branch_id'))->whereIn('loans.status',
+                Sentinel::getUser()->business_id)->whereIn('loans.status',
                 ['disbursed', 'closed', 'written_off'])->join('loan_schedules', 'loans.id', '=',
                 'loan_schedules.loan_id')->where('loan_schedules.deleted_at', NULL)->where('loan_schedules.year',
                 $d[0])->where('loan_schedules.month',
@@ -3432,7 +3430,7 @@ class ReportController extends Controller
         $end_date = $request->end_date;
         if (!empty($start_date)) {
             $data = SavingTransaction::where('reversed', 0)->where('branch_id',
-                session('branch_id'))->whereBetween('date',
+                Sentinel::getUser()->business_id)->whereBetween('date',
                 [$start_date, $end_date])->get();
         }
         return view('savings_report.savings_transactions',
@@ -3450,7 +3448,7 @@ class ReportController extends Controller
         $end_date = $request->end_date;
         if (!empty($start_date)) {
             $data =  SavingTransaction::where('reversed', 0)->where('branch_id',
-                session('branch_id'))->whereBetween('date',
+                Sentinel::getUser()->business_id)->whereBetween('date',
                 [$start_date, $end_date])->get();
             $pdf = PDF::loadView('savings_report.savings_transactions_pdf', compact('start_date',
                 'end_date', 'data'));
@@ -3491,7 +3489,7 @@ class ReportController extends Controller
             $cr = 0;
             $dr = 0;
             foreach (SavingTransaction::where('reversed', 0)->where('branch_id',
-                session('branch_id'))->whereBetween('date',
+                Sentinel::getUser()->business_id)->whereBetween('date',
                 [$start_date, $end_date])->get() as $key) {
                 $dr = $dr + $key->debit;
                 $cr = $cr + $key->credit;
@@ -3579,7 +3577,7 @@ class ReportController extends Controller
             $cr = 0;
             $dr = 0;
             foreach (SavingTransaction::where('reversed', 0)->where('branch_id',
-                session('branch_id'))->whereBetween('date',
+                Sentinel::getUser()->business_id)->whereBetween('date',
                 [$start_date, $end_date])->get() as $key) {
                 $dr = $dr + $key->debit;
                 $cr = $cr + $key->credit;

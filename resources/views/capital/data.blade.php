@@ -1,50 +1,52 @@
 @extends('layouts.master')
 @section('title')
-{{trans_choice('general.capital',2)}}
+Tcobro web | Capital
 @endsection
 @section('content')
+    @if(Sentinel::hasAccess('capital.create'))
+    <p align="right"><a href="{{ url('capital/create') }}" type="button" class="btn btn-primary mr-2">Agregar Capital</a></p>
+    @endif            
 <div class="card">
   <div class="card-body">
     <div class="panel-heading">
-      <h2 class="panel-title">{{trans_choice('general.capital',2)}} {{trans_choice('general.transaction',2)}}</h2>
-
-      <div class="heading-elements">
-        @if(Sentinel::hasAccess('capital.create'))
-        <a href="{{ url('capital/create') }}" class="btn btn-info btn-sm">{{trans_choice('general.add',1)}}
-          {{trans_choice('general.capital',1)}}</a>
-        @endif
-      </div>
+      <h4>Capital</h4>
     </div>
     <div class="panel-body ">
       <div class="table-responsive">
         <table id="order-listing" class="table">
           <thead>
             <tr>
-              <th>{{trans_choice('general.account',1)}}</th>
-              <th>{{trans_choice('general.amount',1)}}</th>
-              <th>{{trans_choice('general.date',1)}}</th>
-              <th>{{trans_choice('general.description',1)}}</th>
-              <th>{{ trans_choice('general.action',1) }}</th>
+              <th><center>Fecha</th>                
+              <th><center>Cuenta</th>
+              <th><center>Monto</th>
+              <th><center>Descripcion</th>
+              <th><center>Acciones</th>
             </tr>
           </thead>
           <tbody>
             @foreach($data as $key)
             <tr>
+              <td><center>{{ $key->date }}</center></td>                
               <td>
+                <center>
                 @if(!empty($key->debit_chart))
-                {{$key->debit_chart->name}}
+                {{$key->credit_chart->name}}
                 @endif
+                </center>    
               </td>
-              <td>
-                {{ $key->amount }}
-              </td>
-              <td>{{ $key->date }}</td>
-              <td>{{ $key->notes }}</td>
-              <td>
-                <a href="{{ url('capital/'.$key->id.'/edit') }}"><img
-                    src="https://img.icons8.com/cute-clipart/64/000000/edit.png" /></a>
-                <a href="{{ url('capital/'.$key->id.'/delete') }}"><img
-                    src="https://img.icons8.com/flat_round/64/000000/delete-sign.png" /></a>
+              <td><center>${{ number_format($key->amount,2) }}</center></td>
+              <td><center>{{ $key->notes }}</center></td>
+              <td style="width:12px";>
+                <!---<a href="{{ url('capital/'.$key->id.'/edit') }}">
+                        <button style="width:110px; height:28px; background-color:#4c82c3; border-color:#4c82c3;" type="button" class="btn btn-info btn-icon-text">
+                            Editar
+                        </button>                 
+                </a>--->
+                <a href="{{ url('capital/'.$key->id.'/delete') }}" class="delete">
+                     <button style="width:110px; height: 28px; background-color:#de3501; border-color:#de3501;"  type="button" class="btn btn-danger btn-icon-text">
+                        Eliminar
+                      </button>            
+                    </a>
               </td>
             </tr>
             @endforeach

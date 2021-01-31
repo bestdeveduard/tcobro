@@ -60,6 +60,7 @@ class LoanRepaymentMethodController extends Controller
     {
         $loan_repayment_method = new LoanRepaymentMethod();
         $loan_repayment_method->name = $request->name;
+        $loan_repayment_method->type_order = $request->type_order;        
         $loan_repayment_method->save();
         Flash::success(trans('general.successfully_saved'));
         return redirect('loan/loan_repayment_method/data');

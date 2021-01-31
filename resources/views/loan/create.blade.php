@@ -1,12 +1,12 @@
 @extends('layouts.master')
 @section('title')
-CrediData | Crear nuevo prestamo
+Tcobro web | Crear prestamo
 @endsection
 @section('content')
 <div class="card">
   <div class="card-body">
     <div class="panel-heading">
-      <h2 class="panel-title">Crear prestamo</h2>
+      <h4>Crear prestamo</h4>
 
       <div class="heading-elements">
 
@@ -15,48 +15,54 @@ CrediData | Crear nuevo prestamo
     {!! Form::open(array('url' => url('loan/store'), 'method' => 'post', 'class' =>
     'form-horizontal',"enctype"=>"multipart/form-data",'id'=>'loan_form')) !!}
     <div class="panel-body">
+     
       <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-4">
           <div class="form-group row">
-            {!! Form::label('loan_product_id',trans_choice("Ruta",1).' '." del ".' '.trans_choice("prestamo",1)."
-            *",array('class'=>'col-sm-3 col-form-label')) !!}
-            <div class="col-sm-9">
+            <label class="col-sm-4 col-form-label" align="center" style="color:#22ae60;"><strong>Ruta</strong></label>
+            <div class="col-sm-8">
               {!! Form::select('loan_product_id',$loan_products,$loan_product->id, array('class' => ' select2
               form-control','required'=>'required','id'=>'loanProduct')) !!}
             </div>
           </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
           <div class="form-group row">
-            {!! Form::label('borrower_id',trans_choice("Nombre del cliente",1)." *",array('class'=>'col-sm-3
-            col-form-label')) !!}
-            <div class="col-sm-9">
-              {!! Form::select('borrower_id',$borrowers,$borrower_id, array('class' => ' select2 form-control',
+            <label class="col-sm-4 col-form-label" align="center"  style="color:#22ae60;"><strong>Cliente</strong></label>
+            <div class="col-sm-8">
+              {!! Form::select('borrower_id',$borrowers,$borrower_id, array('class' => 'js-example-basic-single w-100 form-control',
               'placeholder'=>"Seleccione",'required'=>'required')) !!}
             </div>
           </div>
         </div>
       </div>
 
+
+
       <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-4">
           <div class="form-group row">
-            {!! Form::label('principal',trans_choice('Monto prestado',1)." *",array('class'=>'col-sm-3 col-form-label'))
-            !!}
-            <div class="col-sm-9">
-              {!! Form::text('principal',$loan_product->default_principal, array('class' => 'form-control touchspin',
+            <label class="col-sm-4 col-form-label" align="center" style="color:#22ae60;"><strong>Capital</strong></label>
+            <div class="col-sm-8">
+              {!! Form::text('principal',number_format($loan_product->default_principal,2), array('class' => 'form-control touchspin',
               'placeholder'=>"Monto aprobado",'required'=>'required')) !!}
             </div>
           </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
           <div class="form-group row">
-            {!! Form::label('interest_rate',trans_choice('Interes',1).' (%) *',array('class'=>'col-sm-3
-            col-form-label')) !!}
-            <div class="col-sm-9">
-              {!! Form::text('interest_rate',$loan_product->default_interest_rate, array('class' => 'form-control
+            <label class="col-sm-4 col-form-label" align="center"  style="color:#22ae60;"><strong>Interes %</strong></label>
+            <div class="col-sm-8">
+              {!! Form::text('interest_rate',number_format($loan_product->default_interest_rate,2), array('class' => 'form-control
               touchspin', 'placeholder'=>"",'required'=>'required')) !!}
             </div>
+          </div>
+        </div>
+      </div>
+
+     <div class="row">        
+        <div class="col-md-6">
+          <div class="form-group row">            
             <div style="display: none;" class="col-sm-3">
               {!! Form::select('interest_period',array('month'=>trans_choice("Distribucion
               mensual",1)),$loan_product->interest_period, array('class' => 'form-control',
@@ -66,7 +72,6 @@ CrediData | Crear nuevo prestamo
         </div>
       </div>
 
-
       <div style="display: none;" class="form-group">
         {!! Form::label('loan_officer_id',trans_choice("Responsable del prestamo",1)." *",array('class'=>'col-sm-3
         col-form-label')) !!}
@@ -75,88 +80,11 @@ CrediData | Crear nuevo prestamo
           'placeholder'=>"Seleccione")) !!}
         </div>
       </div>
-
-      <div class="row">
-        <div class="col-md-6">
-          <div class="form-group row">
-            {!! Form::label('loan_duration',trans_choice('Cantidad de cuotas',1)." *",array('class'=>'col-sm-3
-            col-form-label')) !!}
-            <div class="col-sm-9">
-              {!! Form::text('loan_duration',$loan_product->default_loan_duration, array('class' => 'form-control
-              touchspin', 'placeholder'=>"",'required'=>'required')) !!}
-            </div>
             <div style="display: none;" class="col-sm-3">
               {!!
               Form::select('loan_duration_type',array('month'=>trans_choice('general.month',1).'(s)'),$loan_product->default_loan_duration_type,
               array('class' => 'form-control',"id"=>"loan_duration_type",'required'=>'required')) !!}
             </div>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="form-group row">
-            {!! Form::label('repayment_cycle',trans_choice('Modalidad de pago',1)." *",array('class'=>'col-sm-3
-            col-form-label')) !!}
-            <div class="col-sm-9">
-              {!!
-              Form::select('repayment_cycle',array('daily'=>trans_choice('general.daily',1),'weekly'=>trans_choice('general.weekly',1),'bi_monthly'=>trans_choice('general.bi_monthly',1),'monthly'=>trans_choice('general.monthly',1)),$loan_product->repayment_cycle,
-              array('class' => 'form-control',"id"=>"repayment_cycle",'required'=>'required')) !!}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-md-6">
-          <div class="form-group row">
-            {!! Form::label('day_payment',trans_choice('Dia de pago',1)." *",array('class'=>'col-sm-3 col-form-label'))
-            !!}
-            <div class="col-sm-9">
-              {!!
-              Form::select('day_payment',array('Lunes'=>trans_choice('Lunes',1),'Martes'=>trans_choice('Martes',1),'Miercoles'=>trans_choice('Miercoles',1),'Jueves'=>trans_choice('Jueves',1),'viernes'=>trans_choice('Viernes',1),'sabado'=>trans_choice('Sabado',1),'Domingo'=>trans_choice('Domingo',1),'Todos
-              los dias'=>trans_choice('Todos los dias',1),'15 y 30'=>trans_choice('15 y
-              30',1)),$loan_product->day_payment,
-              array('class' => 'form-control',"id"=>"day_payment",'required'=>'required')) !!}
-            </div>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="form-group row">
-            {!! Form::label('release_date',trans_choice('Fecha desembolso',1)." *",array('class'=>'col-sm-3
-            col-form-label'))
-            !!}
-            <div class="col-sm-9">
-              {!! Form::text('release_date',date("Y-m-d"), array('class' => 'form-control date-picker',
-              'placeholder'=>"yyyy-mm-dd",'required'=>'required','id'=>'release_date')) !!}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-md-6">
-          <div class="form-group row">
-            {!! Form::label('first_payment_date',trans_choice('Comienza a pagar',1)." *",array('class'=>'col-sm-3
-            col-form-label')) !!}
-            <div class="col-sm-9">
-              {!! Form::text('first_payment_date',date("Y-m-d"), array('class' => 'form-control date-picker',
-              'placeholder'=>"yyyy-mm-dd",'id'=>'first_payment_date')) !!}
-            </div>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="form-group row">
-            {!! Form::label('interest_method',trans_choice('Tipo de interes',1)." *",array('class'=>'col-sm-3
-            col-form-label')) !!}
-            <div class="col-sm-9">
-              {!! Form::select('interest_method',array('flat_rate'=>trans_choice("Interes
-              fijo",1),'declining_balance_equal_installments'=>trans_choice("Interes
-              amortizable",1)),$loan_product->interest_method, array('class' => 'form-control','required'=>'required'))
-              !!}
-            </div>
-          </div>
-        </div>
-      </div>
-
       <div style="display: none;" class="form-group">
         {!! Form::label('override_interest',trans_choice('general.override',1).'
         '.trans_choice('general.interest',1),array('class'=>'col-sm-3 col-form-label')) !!}
@@ -168,7 +96,77 @@ CrediData | Crear nuevo prestamo
         <div class="col-sm-4">
           <i class="icon-info3" data-toggle="tooltip" title="{{trans_choice('general.override_msg',1)}}"></i>
         </div>
+      </div>            
+
+      <div class="row">
+        <div class="col-md-4">
+          <div class="form-group row">
+            <label class="col-sm-4 col-form-label" align="center" style="color:#22ae60;"><strong>Cuotas</strong></label>
+            <div class="col-sm-8">
+              {!! Form::text('loan_duration',$loan_product->default_loan_duration, array('class' => 'form-control
+              touchspin', 'placeholder'=>"",'required'=>'required')) !!}
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group row">
+            <label class="col-sm-4 col-form-label" align="center"  style="color:#22ae60;"><strong>Modalidad</strong></label>
+            <div class="col-sm-8">
+              {!! Form::select('repayment_cycle',array('daily'=>trans_choice('general.daily',1),'weekly'=>trans_choice('general.weekly',1),'bi_monthly'=>trans_choice('general.bi_monthly',1),'monthly'=>trans_choice('general.monthly',1)),$loan_product->repayment_cycle,
+              array('class' => 'form-control',"id"=>"repayment_cycle",'required'=>'required')) !!}
+            </div>
+          </div>
+        </div>
       </div>
+
+
+      <div class="row">
+        <div class="col-md-4">
+          <div class="form-group row">
+            <label class="col-sm-4 col-form-label" align="center" style="color:#22ae60;"><strong>Dia de pago</strong></label>
+            <div class="col-sm-8">
+              {!! Form::select('day_payment',array('1'=>trans_choice('Lunes',1),'2'=>trans_choice('Martes',1),'3'=>trans_choice('Miercoles',1),'4'=>trans_choice('Jueves',1),'5'=>trans_choice('Viernes',1),'6'=>trans_choice('Sabado',1),'7'=>trans_choice('Domingo',1),'8'=>'Quincenal','9'=>'Mensual','10'=>trans_choice('Diario',1)),$loan_product->day_payment,
+              array('class' => 'form-control',"id"=>"day_payment",'required'=>'required')) !!}
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group row">
+            <label class="col-sm-4 col-form-label" align="center"  style="color:#22ae60;"><strong>Desembolso</strong></label>
+            <div class="col-sm-8">
+              {!! Form::date('release_date',date("Y-m-d"), array('class' => 'form-control date-picker',
+              'placeholder'=>"yyyy-mm-dd",'required'=>'required','id'=>'release_date')) !!}
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="row">
+        <div class="col-md-4">
+          <div class="form-group row">
+            <label class="col-sm-4 col-form-label" align="center" style="color:#22ae60;"><strong>1er pago</strong></label>
+            <div class="col-sm-8">
+              {!! Form::date('first_payment_date',date("Y-m-d"), array('class' => 'form-control date-picker',
+              'placeholder'=>"yyyy-mm-dd",'id'=>'first_payment_date')) !!}
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group row">
+            <label class="col-sm-4 col-form-label" align="center"  style="color:#22ae60;"><strong>Amortizacion</strong></label>
+            <div class="col-sm-8">
+              {!! Form::select('interest_method',array('flat_rate'=>trans_choice("Interes
+              fijo",1),'declining_balance_equal_installments'=>trans_choice("Interes
+              amortizable",1)),$loan_product->interest_method, array('class' => 'form-control','required'=>'required'))
+              !!}
+            </div>
+          </div>
+        </div>
+      </div>              
+
+
+
 
       <div class="row">
         <div class="col-md-6">
@@ -209,31 +207,28 @@ CrediData | Crear nuevo prestamo
       </div>
 
       <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-4">
           <div class="form-group row">
-            {!! Form::label('penalty_status',trans_choice('Activar penalidad',1)." *",array('class'=>'col-sm-3
-            col-form-label')) !!}
-            <div class="col-sm-9">
-              {!!
-              Form::select('penalty_status',array('1'=>trans_choice('Si',1),'0'=>trans_choice('No',1)),$loan_product->penalty_status,
+            <label class="col-sm-4 col-form-label" align="center" style="color:#22ae60;"><strong>Penalidad</strong></label>
+            <div class="col-sm-8">
+              {!! Form::select('penalty_status',array('1'=>trans_choice('Si',1),'0'=>trans_choice('No',1)),$loan_product->penalty_status,
               array('class' => 'form-control',"id"=>"day_payment",'required'=>'required')) !!}
             </div>
           </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
           <div class="form-group row">
-            {!! Form::label('saturday', 'Calendario de pagos incluye sabados?', array('class'=>'col-sm-6
-            col-form-label'))
-            !!}
-            <div class="col-sm-6">
-              <input type="checkbox" name="includes_sat" value="yes" class="form-control" style="width: 20px;">
+            <label class="col-sm-4 col-form-label" align="center"  style="color:#22ae60;"><strong>Contrato</strong></label>
+            <div style="width: 10px;">
+              {!! Form::file('files[]', array('class' => 'form-control file-styled', 'multiple'=>"multiple")) !!}
             </div>
           </div>
         </div>
-      </div>
+</div>
+
 
       <div class="row">
-        <div class="col-md-6">
+        <div  style="display: none;" class="col-md-6">
           <div class="form-group row">
             {!! Form::label('sunday', 'Calendario de pagos incluye Domingos?', array('class'=>'col-sm-6
             col-form-label')) !!}
@@ -242,12 +237,13 @@ CrediData | Crear nuevo prestamo
             </div>
           </div>
         </div>
-        <div class="col-md-6">
+        <div  style="display: none;"  class="col-md-6">
           <div class="form-group row">
-            {!! Form::label('files',trans_choice("Adjunte contrato",1).' del prestamo',array('class'=>'col-sm-3
-            col-form-label')) !!}
-            <div class="col-sm-9">
-              {!! Form::file('files[]', array('class' => 'form-control file-styled', 'multiple'=>"multiple")) !!}
+            {!! Form::label('saturday', 'Calendario de pagos incluye sabados?', array('class'=>'col-sm-6
+            col-form-label'))
+            !!}
+            <div class="col-sm-6">
+              <input type="checkbox" name="includes_sat" value="1" class="form-control" style="width: 20px;">
             </div>
           </div>
         </div>
@@ -255,11 +251,7 @@ CrediData | Crear nuevo prestamo
 
       <p style="display: none;" class="bg-navy color-palette">{{trans_choice('general.charge',2)}}</p>
 
-      <br>
-      <br>
-      <br>
-      <br>
-
+      
       <div style="display: none;" class="form-group" id="chargesDiv">
         <div style="display: none;" id="saved_charges">
           @foreach($loan_product->charges as $key)
@@ -385,13 +377,9 @@ CrediData | Crear nuevo prestamo
       </div>
       @endforeach
     </div>
-    <!-- /.panel-body -->
-    <div class="panel-footer">
-      <div class="heading-elements">
-        <button type="submit" class="btn btn-primary pull-right">{{trans_choice('general.save',1)}}</button>
-        <a class="btn btn-secondary" style="margin-left: 11px;" href="{{url('loan/data')}}">Cancelar</a>
-      </div>
-    </div>
+
+          <button style="width:115px;" type="submit" class="btn btn-primary mr-2">Confirmar</button>
+          <a style="width:115px;" class="btn btn-light" href="{{ url('loan/data') }}">Cancelar</a>     
     {!! Form::close() !!}
   </div>
   <!-- /.box -->

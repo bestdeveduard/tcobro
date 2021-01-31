@@ -1,49 +1,60 @@
 @extends('layouts.master')
-@section('title'){{trans_choice('general.edit',1)}} {{trans_choice('general.repayment',1)}}
+@section('title')
+Tcobro Web | Editar pago
 @endsection
 @section('content')
-    <div class="panel panel-white">
-        <div class="panel-heading">
-            <h6 class="panel-title">{{trans_choice('general.edit',1)}} {{trans_choice('general.repayment',1)}}</h6>
+<div class="col-12 grid-margin">
+  <div class="card">
+    <div class="card-body">
+      <h5>Editar pago</h5>      
 
-            <div class="heading-elements">
-
-            </div>
-        </div>
         {!! Form::open(array('url' => url('loan/repayment/'.$loan_transaction->id.'/update'), 'method' => 'post', 'class' => 'form-horizontal')) !!}
-        <div class="panel-body">
-            <div class="form-group">
-                {!! Form::label('amount',trans_choice('general.repayment',1).' '.trans_choice('general.amount',1),array('class'=>'col-sm-3 control-label')) !!}
-                <div class="col-sm-5">
-                    {!! Form::text('amount',$loan_transaction->credit, array('class' => 'form-control touchspin', 'placeholder'=>"Ingrese el monto del pago sin comas",'required'=>'required')) !!}
-                </div>
+      <p class="card-description">
+      </p>
+      <div class="row">
+        <div class="col-md-4">
+          <div class="form-group row">
+            <label class="col-sm-3 col-form-label" style="color:#22ae60;"><strong>Monto *</strong></label>
+            <div class="col-sm-8">
+{!! Form::text('amount',number_format($loan_transaction->credit,2), array('class' => 'form-control touchspin', 'placeholder'=>"Ingrese el monto del pago sin comas",'required'=>'required')) !!}
             </div>
-            <div class="form-group">
-                {!! Form::label('repayment_method_id',trans_choice('general.repayment',1).' '.trans_choice('general.method',1),array('class'=>'col-sm-3 control-label')) !!}
-                <div class="col-sm-5">
-                    {!! Form::select('repayment_method_id',$repayment_methods,$loan_transaction->repayment_method_id, array('class' => ' form-control','required'=>'required','id'=>'loanProduct')) !!}
-                </div>
-            </div>
-            <div class="form-group">
-                {!! Form::label('receipt',trans_choice('general.receipt',1),array('class'=>'col-sm-3 control-label')) !!}
-                <div class="col-sm-5">
-                    {!! Form::text('receipt',$loan_transaction->receipt, array('class' => 'form-control', 'placeholder'=>"",''=>'required')) !!}
-                </div>
-            </div>
-            <div class="form-group">
-                {!! Form::label('collection_date',trans_choice('general.collection',1).' '.trans_choice('general.date',1),array('class'=>'col-sm-3 control-label')) !!}
-                <div class="col-sm-5">
-                    {!! Form::text('collection_date',$loan_transaction->date, array('class' => 'form-control date-picker', 'placeholder'=>"",'required'=>'required')) !!}
-                </div>
-            </div>
+          </div>
+        </div>
 
-            <div class="form-group">
-                {!! Form::label('notes',trans_choice('general.description',1),array('class'=>'col-sm-3 control-label')) !!}
-                <div class="col-sm-9">
-                    {!! Form::textarea('notes',$loan_transaction->notes, array('class' => 'form-control', 'rows'=>"4")) !!}
-                </div>
+
+        <div class="col-md-4">
+          <div class="form-group row">
+            <label class="col-sm-3 col-form-label" style="color:#22ae60;"><strong>Forma *</strong></label>
+            <div class="col-sm-8">
+ {!! Form::select('repayment_method_id',$repayment_methods,$loan_transaction->repayment_method_id, array('class' => ' form-control','required'=>'required','id'=>'loanProduct')) !!}
             </div>
-            <p class="bg-navy disabled color-palette">{{trans_choice('general.custom_field',2)}}</p>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="row">
+        <div class="col-md-4">
+          <div class="form-group row">
+            <label class="col-sm-3 col-form-label" style="color:#22ae60;"><strong>Fecha *</strong></label>
+            <div class="col-sm-8">
+ {!! Form::date('collection_date',$loan_transaction->date, array('class' => 'form-control date-picker', 'placeholder'=>"",'required'=>'required')) !!}
+            </div>
+          </div>
+        </div>
+
+
+        <div class="col-md-4">
+          <div class="form-group row">
+            <label class="col-sm-3 col-form-label" style="color:#22ae60;"><strong>Notas</strong></label>
+            <div class="col-sm-8">
+{!! Form::text('notes',$loan_transaction->notes, array('class' => 'form-control', 'rows'=>"4")) !!}
+            </div>
+          </div>
+        </div>
+      </div>
+
+
             @foreach($custom_fields as $key)
 
                 <div class="form-group">
@@ -74,16 +85,11 @@
                     @endif
                 </div>
             @endforeach
+      <button style="width:115px;" type="submit" class="btn btn-primary mr-2">Guardar</button>
+          <a style="width:115px;" class="btn btn-light" href="{{ url('repayment/data') }}">Cancelar</a>    
+      {!! Form::close() !!}
 
-        </div>
-        <!-- /.panel-body -->
-        <div class="panel-footer">
-            <div class="heading-elements">
-                <button type="submit" class="btn btn-primary pull-right">{{trans_choice('general.save',1)}}</button>
-            </div>
-        </div>
-        {!! Form::close() !!}
     </div>
-    <!-- /.box -->
+  </div>
+</div>
 @endsection
-

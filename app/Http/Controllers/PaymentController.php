@@ -51,6 +51,32 @@ class PaymentController extends Controller
         $price = $request->get('price');
         $plan_id = $request->get('plan_id');
         $plan_duration = $request->get('plan_duration');
+
+        if ($price == '0' || empty($price)) {            
+
+            $business = DB::table('users')->orderBy('business_id','DESC')->first();
+
+            $l = User::find($user_id);
+            $l->business_id = $business->business_id + 1;
+            $l->plan_id = $plan_id;
+            $l->plan_status= 1;
+            $l->plan_active_date = date('Y-m-d');
+            $l->plan_expired_date = date_format(date_add(date_create(date('Y-m-d')),
+                    date_interval_create_from_date_string($plan_duration.' days')),
+                    'Y-m-d');
+            $l->save();
+
+            DB::table('branch_users')->insert([
+                'branch_id' => 1,
+                'user_id' => $user_id,
+                'created_at' => date('Y-m-d h:i:s'),
+                'updated_at' => date('Y-m-d h:i:s')
+            ]);
+
+            Flash::success("You have a plan and can login now.");
+            $msg = "You have a plan and can login now.";
+            return redirect('admin')->with('msg', $msg);
+        }
         
         \Session::put('user_id', $user_id);
         \Session::put('plan_id', $plan_id);
@@ -59,7 +85,7 @@ class PaymentController extends Controller
         $payer = new Payer();
         $payer->setPaymentMethod('paypal');
 
-        $item_1 = new Item();        
+        $item_1 = new Item();
         $item_1->setName('Plan Item') /** item name **/
                 ->setCurrency('USD')
                 ->setQuantity(1)
@@ -156,6 +182,13 @@ class PaymentController extends Controller
                     date_interval_create_from_date_string($plan_duration.' days')),
                     'Y-m-d');
             $l->save();
+
+            DB::table('branch_users')->insert([
+                'branch_id' => 1,
+                'user_id' => $user_id,
+                'created_at' => date('Y-m-d h:i:s'),
+                'updated_at' => date('Y-m-d h:i:s')
+            ]);
 
             \Session::forget('user_id');
             \Session::forget('plan_id');

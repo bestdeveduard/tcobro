@@ -29,7 +29,9 @@ class User extends EloquentUser
         "start_time",
         "end_time",
         "collector_role",
-        "business_id"
+        "business_id",
+        "business_name",
+        "business_address"
     ];
     
     public function payroll()

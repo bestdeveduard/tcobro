@@ -1,13 +1,13 @@
 @extends('layouts.master')
 @section('title')
-Nuevo Cliente
+Tcobro Web | Crear Cliente
 @endsection
 @section('content')
 <!---{{trans_choice('general.add',1)}} {{trans_choice('general.borrower',1)}}--->
 <div class="card">
   <div class="card-body">
     <div class="panel-heading">
-      <h3 class="panel-title ">Registrar nuevo cliente</h3>
+      <h4>Registrar nuevo cliente</h4>
       <div class="heading-elements">
 
       </div>
@@ -17,14 +17,14 @@ Nuevo Cliente
     <div class="panel-body">
       <div class="form-group">
         <p class="card-description">
-        <h5 style="color:#46b979;">Datos personales</h5>
+        <h5>Datos personales</h5>
         </p>
         <input type="hidden" name="title" id="title" value="Mr"></input>
         <input type="hidden" name="gender" id="gender" value="male"></input>
         <div class="row">
           <div class="col-md-4">
             <div class="form-group row">
-              <label class="col-sm-3 col-form-label" align="right">{{trans_choice('general.first_name',1)}} *</label>
+              <label class="col-sm-3 col-form-label" style="color:#46b979;"><strong>Nombres</strong></label>
               <div class="col-sm-9">
                 {!! Form::text('first_name',null, array('class' => 'form-control',
                 'placeholder'=>trans_choice('general.first_name',1),'required'=>'required')) !!}
@@ -33,7 +33,7 @@ Nuevo Cliente
           </div>
           <div class="col-md-4">
             <div class="form-group row">
-              <label class="col-sm-3 col-form-label" align="right">{{trans_choice('general.last_name',1)}} *</label>
+              <label class="col-sm-3 col-form-label" style="color:#46b979;"><strong>Apellidos</strong></label>
               <div class="col-sm-9">
                 {!! Form::text('last_name',null, array('class' => 'form-control',
                 'placeholder'=>trans_choice('general.last_name',1),'required'=>'required')) !!}
@@ -42,171 +42,221 @@ Nuevo Cliente
           </div>
           <div class="col-md-4">
             <div class="form-group row">
-              <label class="col-sm-4 col-form-label" align="right">ID/Pasaporte</label>
+              <label class="col-sm-4 col-form-label" style="color:#46b979;"><strong>ID/Pasaporte</strong></label>
               <div class="col-sm-8">
                 {!! Form::text('unique_number',null, array('class' =>'form-control',
-                'placeholder'=>trans_choice('general.unique_number',1),'required'=>'required')) !!}
+                'placeholder'=>trans_choice('general.unique_number',1))) !!}
               </div>
             </div>
           </div>
         </div>
       </div>
-      <p class="card-description">
-      <h5 style="color:#46b979;">Datos de contacto</h5>
-      </p>
-      <div class="form-group">
+
+<div class="form-group">
+        <p class="card-description">
+        <h5>Datos de contacto</h5>
+        </p>
         <div class="row">
-          <div class="col-md-6">
+          <div class="col-md-4">
             <div class="form-group row">
-              <label class="col-sm-3 col-form-label">Direccion *</label>
-              <div class="col-sm-8">
-                {!! Form::text('address',null, array('class' => 'form-control', 'placeholder'=>"")) !!}
+              <label class="col-sm-3 col-form-label" style="color:#46b979;"><strong>Direccion</strong></label>
+              <div class="col-sm-9">
+ {!! Form::text('address',null, array('class' => 'form-control', 'placeholder'=>"")) !!}
               </div>
             </div>
           </div>
-          <div class="col-md-6">
+          <div class="col-md-4">
             <div class="form-group row">
-              <label class="col-sm-3 col-form-label">{{trans_choice('general.country',1)}}</label>
+              <label class="col-sm-3 col-form-label" style="color:#46b979;"><strong>Pais</strong></label>
               <div class="col-sm-9">
-                {!!
-                Form::select('country_id',$countries,\App\Models\Setting::where('setting_key','company_country')->first()->setting_value,array('class'=>'form-control
-                select2','placeholder'=>'','required'=>'required')) !!}
+     {!! Form::select('country_id',$countries,\App\Models\Setting::where('setting_key','company_country')->first()->setting_value,array('class'=>'form-control
+                select2','placeholder'=>'')) !!}
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group row">
+              <label class="col-sm-4 col-form-label" style="color:#46b979;"><strong>Movil</strong></label>
+              <div class="col-sm-8">
+                {!! Form::number('mobile',null, array('class' => 'form-control',
+                'placeholder'=>"999 999-9999")) !!}
               </div>
             </div>
           </div>
         </div>
+      </div>      
+      
 
+
+
+
+
+
+<div class="form-group">
         <div class="row">
-          <div class="col-md-6">
+          <div class="col-md-4">
             <div class="form-group row">
-              <label class="col-sm-3 col-form-label">Telefono movil *</label>
-              <div class="col-sm-8">
-                {!! Form::text('mobile',null, array('class' => 'form-control',
-                'placeholder'=>trans_choice('general.numbers_only',1))) !!}
-              </div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="form-group row">
-              <label class="col-sm-3 col-form-label">Telefono fijo</label>
+              <label class="col-sm-3 col-form-label" style="color:#46b979;"><strong>Telefono</strong></label>
               <div class="col-sm-9">
                 {!! Form::text('phone',null, array('class' => 'form-control', 'placeholder'=>"")) !!}
               </div>
             </div>
           </div>
-        </div>
-
-        <div class="row">
-          <div class="col-md-6">
+          <div class="col-md-4">
             <div class="form-group row">
-              <label class="col-sm-3 col-form-label">Email</label>
-              <div class="col-sm-8">
+              <label class="col-sm-3 col-form-label" style="color:#46b979;"><strong>Email</strong></label>
+              <div class="col-sm-9">
                 {!! Form::text('email',null, array('class' => 'form-control',
                 'placeholder'=>trans_choice('general.email',1))) !!}
               </div>
             </div>
           </div>
+          <div class="col-md-4">
+            <div class="form-group row">
+              <label class="col-sm-4 col-form-label" style="color:#46b979;"><strong>
+                  Geolocalizacion
+              </strong></label>
+              <div class="col-sm-8">
+                <input type="text" class="form-control" id="geolocation" name="geolocation"></input>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>        
+      
+      <div class="form-group">
+        <div class="row">
+
           <div class="col-md-6">
             <div class="form-group row">
-              <label class="col-sm-3 col-form-label">Geolocalizacion:</label>
-              <div class="col-sm-2">
-                <a class="btn btn-secondary" onclick="showMap()">Mapa</a>
+              <label class="col-sm-4 col-form-label" style="color:#46b979;"><strong>Mapa</strong></label>
+              <div class="col-sm-4">
+                <a class="btn btn-warning" onclick="showMap()">Mapa</a>
               </div>
               <div class="col-sm-7">
-                <div id="map-canvas" style="display: none; width: 100%; height: 130px;" data-lat="none" data-lng="none" data-zoom="16"
-                  data-style="6"></div>
-                  <input type="hidden" id="geolocation" name="geolocation"></input>
-              </div>
+                <div id="map-canvas" style="display: none; width: 100%; height: 250px;" data-lat="none" data-lng="none" data-zoom="16"
+                  data-style="6">
+                </div>
             </div>
           </div>
         </div>
       </div>
 
       <p class="card-description">
-      <h5 style="color:#46b979;">Informacion Laboral</h5>
+      <h5>Informacion Laboral</h5>
       </p>
-      <div class="form-group">
+      
+<div class="form-group">
         <div class="row">
-          <div class="col-md-6">
+          <div class="col-md-4">
             <div class="form-group row">
-              <label class="col-sm-3 col-form-label">{{trans_choice('general.business',1)}}</label>
-              <div class="col-sm-8">
+              <label class="col-sm-3 col-form-label" style="color:#46b979;"><strong>Empresa</strong></label>
+              <div class="col-sm-9">
                 {!! Form::text('business_name',null, array('class' => 'form-control', 'placeholder'=>"")) !!}
               </div>
             </div>
           </div>
-          <div class="col-md-6">
+          <div class="col-md-4">
             <div class="form-group row">
-              <label class="col-sm-3 col-form-label">{{trans_choice('Telefono Empresa',1)}}</label>
+              <label class="col-sm-3 col-form-label" style="color:#46b979;"><strong>Telefono</strong></label>
               <div class="col-sm-9">
-                {!! Form::text('phone_business',null, array('class' => 'form-control', 'placeholder'=>"")) !!}
+                {!! Form::number('phone_business',null, array('class' => 'form-control', 'placeholder'=>"999 999-9999")) !!}
               </div>
             </div>
           </div>
-        </div>
-
-        <div class="row">
-          <div class="col-md-6">
+          <div class="col-md-4">
             <div class="form-group row">
-              <label class="col-sm-3 col-form-label">{{trans_choice('general.working_status',1)}}</label>
+              <label class="col-sm-4 col-form-label" style="color:#46b979;"><strong>
+                  Ocupacion
+              </strong></label>
               <div class="col-sm-8">
-                {!!
-                Form::select('working_status',array('Employee'=>trans_choice('general.Employee',1),'Owner'=>trans_choice('general.Owner',1),'Student'=>trans_choice('general.Student',1),'Overseas
-                Worker'=>trans_choice('general.Overseas
-                Worker',1),'Pensioner'=>trans_choice('general.Pensioner',1),'Unemployed'=>trans_choice('general.Unemployed',1)),null,
+                {!! Form::select('working_status',array('Employee'=>trans_choice('general.Employee',1),'Owner'=>trans_choice('general.Owner',1),'Student'=>trans_choice('general.Student',1),'Pensioner'=>trans_choice('general.Pensioner',1),'Unemployed'=>trans_choice('general.Unemployed',1)),null,
                 array('class' => 'form-control',)) !!}
               </div>
             </div>
           </div>
-          <div class="col-md-6">
+        </div>
+      </div>    
+
+
+<div class="form-group">
+        <div class="row">
+          <div class="col-md-4">
             <div class="form-group row">
-              <label class="col-sm-3 col-form-label">Tiempo laborando</label>
+              <label class="col-sm-3 col-form-label" style="color:#46b979;"><strong>Tiempo</strong></label>
               <div class="col-sm-9">
                 {!! Form::text('working_time',null, array('class' => 'form-control', 'placeholder'=>"")) !!}
               </div>
             </div>
           </div>
-          <div class="col-md-6">
+          <div class="col-md-4">
             <div class="form-group row">
-              <label class="col-sm-3 col-form-label">Ingresos $</label>
-              <div class="col-sm-8">
+              <label class="col-sm-3 col-form-label" style="color:#46b979;"><strong>Ingresos</strong></label>
+              <div class="col-sm-9">
                 {!! Form::number('ingresos',null, array('class' => 'form-control', 'placeholder'=>"")) !!}
               </div>
             </div>
           </div>
+          <div class="col-md-4">
+            <div class="form-group row">
+              <label class="col-sm-4 col-form-label" style="color:#46b979;"><strong>
+                  
+              </strong></label>
+              <div class="col-sm-8">
+                  
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      </div>      
+      
+      
 
       <p class="card-description">
-      <h5 style="color:#46b979;">Informacion codeudor</h5>
+      <h5>Informacion codeudor</h5>
       </p>
-      <div class="form-group">
+      
+<div class="form-group">
         <div class="row">
-          <div class="col-md-6">
+          <div class="col-md-4">
             <div class="form-group row">
-              <label class="col-sm-3 col-form-label">Referencias</label>
-              <div class="col-sm-8">
+              <label class="col-sm-3 col-form-label" style="color:#46b979;"><strong>Referencia</strong></label>
+              <div class="col-sm-9">
                 {!! Form::text('referencia_1',null, array('class' => 'form-control', 'placeholder'=>"")) !!}
               </div>
             </div>
           </div>
-          <div class="col-md-6">
+          <div class="col-md-4">
             <div class="form-group row">
-              <label class="col-sm-3 col-form-label">Telefono</label>
+              <label class="col-sm-3 col-form-label" style="color:#46b979;"><strong>Telefono</strong></label>
               <div class="col-sm-9">
-                {!! Form::text('company_phone',null, array('class' => 'form-control', 'placeholder'=>"")) !!}
+                {!! Form::number('company_phone',null, array('class' => 'form-control', 'placeholder'=>"999 999-9999")) !!}
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group row">
+              <label class="col-sm-4 col-form-label" style="color:#46b979;"><strong>
+                  
+              </strong></label>
+              <div class="col-sm-8">
+                  
               </div>
             </div>
           </div>
         </div>
-      </div>
+      </div>      
 
       <p class="card-description">
-      <h5 style="color:#46b979;">Archivos</h5>
+      <h5>Archivos</h5>
       </p>
-      <div class="form-group">
-        <label>Adjuntar imagen</label>
-        <div class="input-group col-xs-12">
+<div class="form-group">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="form-group row">
+              <label class="col-sm-3 col-form-label" style="color:#46b979;"><strong>Foto perfil</strong></label>
+              <div class="col-sm-9">
+<div class="input-group col-xs-3">
           <input type="text" class="form-control file-upload-info" style="border-bottom-style: solid;" disabled
             placeholder="Cargar documento">
           <span class="input-group-append">
@@ -214,11 +264,16 @@ Nuevo Cliente
             <input type="file" name="photo" class="file-upload-default"
               style="visibility: visible; position: absolute; z-index: 2; opacity: 0; height: 45px; width: 90px;">
           </span>
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Adjuntar Documentos</label>
-        <div class="input-group col-xs-12">
+          </div>
+          
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group row">
+              <label class="col-sm-3 col-form-label" style="color:#46b979;"><strong>Identificación</strong></label>
+              <div class="col-sm-9">
+<div class="input-group col-xs-3">
           <input type="text" class="form-control file-upload-info" style="border-bottom-style: solid;" disabled
             placeholder="Cargar documento">
           <span class="input-group-append">
@@ -226,19 +281,37 @@ Nuevo Cliente
             <input type="file" name="files[]" class="file-upload-default"
               style="visibility: visible; position: absolute; z-index: 2; opacity: 0; height: 45px; width: 90px;">
           </span>
+          </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="form-group">
-        <label for="exampleTextarea1">Notas</label>
-        {!! Form::textarea('notes',null, array('class' => 'form-control', 'placeholder'=>"",'rows'=>'3')) !!}
-      </div>
+      </div>      
+      
+
+
+
+<div class="form-group">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="form-group row">
+              <label class="col-sm-1 col-form-label" style="color:#46b979;"><strong>
+              Notas
+              </strong></label>
+              <div class="col-sm-7">
+        {!! Form::text('notes',null, array('class' => 'form-control', 'placeholder'=>"",'rows'=>'3')) !!}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div> 
 
       <div class="form-group" style="display: none;">
         <div class="row">
           <div class="col-md-4">
             {!! Form::label('whatsapp_enabled',trans('Envio mensajes Whatsapp'),array('class'=>'control-label')) !!}
             {!! Form::select('whatsapp_enabled',array('0'=>trans('general.no'), '1'=>trans('general.yes')),
-            null, array('class'=>'form-control','required'=>'required')) !!}
+            null, array('class'=>'form-control')) !!}
           </div>
         </div>
       </div>
@@ -289,13 +362,8 @@ Nuevo Cliente
       @endforeach
     </div>
     <!-- /.panel-body -->
-    <div class="panel-footer">
-      <div>
-        <button type="submit" class="btn btn-info pull-right">{{trans_choice('general.save',1)}}</button>
-
-        <a class="btn btn-secondary" href="{{url('borrower/data')}}">Cancelar</a>
-      </div>
-    </div>
+          <button style="width:115px;" type="submit" class="btn btn-primary mr-2">Confirmar</button>
+          <a style="width:115px;" class="btn btn-light" href="{{ url('borrower/data') }}">Cancelar</a>     
     {!! Form::close() !!}
   </div>
 </div>

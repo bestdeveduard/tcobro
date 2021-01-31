@@ -1,8 +1,9 @@
 @extends('layouts.master')
 @section('title')
-Collectors
+Tcobro | Cobradores
 @endsection
 @section('content')
+<p align="right"><a href="{{ url('user/collector/create') }}" type="button" class="btn btn-primary mr-2">Crear cobrador</a></p>
 <div class="card">
   <div class="card-body">
 
@@ -38,13 +39,7 @@ Collectors
     @endif
 
     <div class="panel-heading">
-      <h2 class="panel-title">Reports collector user</h2>
-
-      <div class="heading-elements">
-        <a href="{{ url('user/collector/create') }}" class="btn btn-info btn-xs">
-          Add Collector
-        </a>
-      </div>
+      <h2 class="panel-title">Cobradores</h2>
     </div>
 
     <div class="row">
@@ -54,12 +49,11 @@ Collectors
             <thead>
               <tr>
                 <th>#</th>
-                <th>Member ID</th>
-                <th>Collector name</th>
+                <th>Nombre cobrador</th>
                 <th>Email</th>
-                <th>Phone</th>
-                <th>Condition</th>
-                <th>Action</th>
+                <th>Telefono</th>
+                <!---<th>Condicion</th>--->
+                <th style="width:12px" ;>Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -70,18 +64,33 @@ Collectors
               @foreach($data as $key)
               <tr>
                 <td>{{$num}}</td>
-                <td>{{ $key->business_id }}</td>
                 <td>{{ $key->first_name }} {{ $key->last_name }}</td>
                 <td>{{ $key->email }}</td>
                 <td>{{ $key->phone }}</td>
-                <td>Secondary</td>
+                <!---<td>Secondary</td>--->
                 <td>
-                  <a href="{{url('user/collector/'.$key->id.'/role')}}"><img
-                      src="https://img.icons8.com/dusk/64/000000/admin-settings-male.png" /></a>
-                  <a href="{{url('user/collector/'.$key->id.'/edit')}}"><img
-                      src="https://img.icons8.com/cute-clipart/64/000000/edit.png" /></a>
-                  <a id="deleteProductId" plan_id="{{ $key->id }}"><img
-                      src="https://img.icons8.com/flat_round/64/000000/delete-sign.png" /></a>
+
+                      
+                  <a href="{{url('user/collector/'.$key->id.'/edit')}}">
+                <button style="width:110px; height:28px; background-color:#4c82c3; border-color:#4c82c3;" type="button"
+                  class="btn btn-info btn-icon-text">
+                  Editar
+                </button>                      
+                  </a>
+                  <a href="{{url('user/collector/'.$key->id.'/role')}}">
+                  <button
+                    style="width:110px; height:28px; color: white; background-color:#008080; border-color:#008080;"
+                    type="button" class="btn btn-white btn-icon-text">
+                    Roles
+                  </button>                  
+                   </a>                  
+                  <a href="{{url('user/collector/'.$key->id.'/delete')}}" class="delete">
+                <button style="width:110px; height:28px; background-color:#de3501; border-color:#de3501;" type="button"
+                  class="btn btn-danger btn-icon-text">
+                  Eliminar
+                </button>                  
+                  </a>
+                  
                 </td>
               </tr>
               @php
@@ -95,40 +104,6 @@ Collectors
     </div>
   </div>
 </div>
-
-<div class="modal fade" id="deleteproductmodal" tabindex="-1" role="dialog" aria-labelledby="deleteProductModalLabel">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-            aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="deleteProductModalLabel">Delete Collector</h4>
-      </div>
-      {!! Form::open(array('url' =>url('user/collector/delete'), 'name'=>'deleteProduct', 'id'=>'deleteProduct',
-      'method'=>'post', 'class' => 'form-horizontal', 'enctype'=>'multipart/form-data')) !!}
-      {!! Form::hidden('action', 'delete', array('class'=>'form-control')) !!}
-      {!! Form::hidden('user_id', '', array('class'=>'form-control', 'id'=>'user_id')) !!}
-      <div class="modal-body">
-        <center>
-          <h5>Are you sure to delete this collector?</h5>
-        </center>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Cancelar</button>
-        <button type="submit" class="btn btn-primary" id="deleteProduct">Delete</button>
-      </div>
-      {!! Form::close() !!}
-    </div>
-  </div>
-</div>
-
-<script type="text/javascript">
-$(document).on('click', '#deleteProductId', function() {
-  var plan_id = $(this).attr('plan_id');
-  $('#user_id').val(plan_id);
-  $("#deleteproductmodal").modal('show');
-});
-</script>
 @endsection
 
 @section('footer-scripts')

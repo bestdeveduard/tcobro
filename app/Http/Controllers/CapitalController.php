@@ -82,10 +82,10 @@ class CapitalController extends Controller
             $chart_assets[$key->id] = $key->name;
         }
         $chart[trans_choice('asset',2)]=$chart_assets;
-        $chart[trans_choice('income',2)]=$chart_income;
-        $chart[trans_choice('liability',2)]=$chart_liability;
+      //  $chart[trans_choice('income',2)]=$chart_income;
+      //  $chart[trans_choice('liability',2)]=$chart_liability;
         $chart[trans_choice('equity',2)]=$chart_equity;
-        $chart[trans_choice('expense',2)]=$chart_expenses;
+     //   $chart[trans_choice('expense',2)]=$chart_expenses;
         return view('capital.create', compact('chart'));
     }
 
@@ -105,8 +105,8 @@ class CapitalController extends Controller
         $capital->user_id = Sentinel::getUser()->id;
         $capital->amount = $request->amount;
         $capital->branch_id = Sentinel::getUser()->business_id;
-        $capital->debit_account_id = $request->debit_account_id;
-        $capital->credit_account_id = $request->credit_account_id;
+         $capital->debit_account_id = 1;
+        $capital->credit_account_id = 7;
         $capital->notes = $request->notes;
         $capital->date = date("Y-m-d", strtotime($request->date));
         $date = explode('-', date("Y-m-d", strtotime($request->date)));
@@ -211,8 +211,8 @@ class CapitalController extends Controller
         }
         $capital = Capital::find($id);
         $capital->amount = $request->amount;
-        $capital->debit_account_id = $request->debit_account_id;
-        $capital->credit_account_id = $request->credit_account_id;
+        $capital->debit_account_id = 1;
+        $capital->credit_account_id = 7;        
         $capital->notes = $request->notes;
         $capital->date = date("Y-m-d", strtotime($request->date));
         $date = explode('-', date("Y-m-d", strtotime($request->date)));

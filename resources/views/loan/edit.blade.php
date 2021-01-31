@@ -101,8 +101,7 @@ CrediData | Editar prestamo
             {!! Form::label('day_payment',trans_choice("Dia de pago *",1),array('class'=>'col-sm-4 col-form-label')) !!}
             <div class="col-sm-8">
               {!!
-              Form::select('day_payment',array('Lunes'=>trans_choice('Lunes',1),'Martes'=>trans_choice('Martes',1),'Miercoles'=>trans_choice('Miercoles',1),'Jueves'=>trans_choice('Jueves',1),'Viernes'=>trans_choice('viernes',1),'Sabado'=>trans_choice('sabado',1),'Domingo'=>trans_choice('Domingo',1),'Todos
-              los dias'=>trans_choice('Todos los dias',1),'15 y 30'=>trans_choice('15 y 30',1)),$loan->day_payment,
+              Form::select('day_payment',array('1'=>trans_choice('Lunes',1),'2'=>trans_choice('Martes',1),'3'=>trans_choice('Miercoles',1),'4'=>trans_choice('Jueves',1),'5'=>trans_choice('Viernes',1),'6'=>trans_choice('Sabado',1),'7'=>trans_choice('Domingo',1),'8'=>'Quincenal','9'=>'Mensual','10'=>trans_choice('Todos los dias',1)),$loan->day_payment,
               array('class' => 'form-control', 'placeholder'=>"","id"=>"",'required'=>'required')) !!}
             </div>
           </div>

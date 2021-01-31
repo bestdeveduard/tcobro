@@ -225,12 +225,12 @@ class UserController extends Controller
     {
         $user = Sentinel::findById(Sentinel::getUser()->id);
         $credentials = [
-            'email' => $request->email,
+            // 'email' => $request->email,
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
-            'address' => $request->address,
+            'business_address' => $request->business_address,
+            'business_name' => $request->business_name,
             'notes' => $request->notes,
-            'gender' => $request->gender,
             'phone' => $request->phone
         ];
         if (!empty($request->password)) {
@@ -238,7 +238,7 @@ class UserController extends Controller
         }
         $user = Sentinel::update($user, $credentials);
         Flash::success("Procesado con exito");
-        return redirect('dashboard');
+        return redirect('user/profile');
     }
 
     public function getgpsmap(Request $request)
@@ -260,7 +260,7 @@ class UserController extends Controller
 
         $user = \App\Models\User::where('id', '=', $user_id)->get()->first();
 
-        $users_list = \App\Models\User::orderBy('id', 'asc')->get();
+        $users_list = \App\Models\User::where('business_id', Sentinel::getUser()->business_id)->orderBy('id', 'asc')->get();
 
         foreach($payments = \App\Models\LoanTransaction::where('user_id', $user_id)->where('transaction_type', 'repayment')->where('reversed', 0)->where('date', $end_date)->orderBy('id')->get() as $key) {            
             $loan = \App\Models\Loan::where('id', $key->loan_id)->first();
@@ -533,14 +533,13 @@ class UserController extends Controller
         return redirect('user/collector/data');
     }
 
-    public function deleteCollector()
+    public function deleteCollector($id)
     {
         if (!Sentinel::hasAccess('users.delete')) {
             Flash::warning("Acceso no permitido");
             return redirect('/');
         }
-
-        $id = Input::get('user_id');
+        
         if ( Sentinel::getUser()->id == $id) {
             Flash::warning("No puedes borrar tu propia cuenta");
             return redirect('/');
@@ -554,7 +553,7 @@ class UserController extends Controller
 
     public function collectorRole($id) {
         $data = array();
-        $permissions = Permission::where('parent_id', 0)->get();
+        $permissions = Permission::where('parent_id', 0)->where('hidden_role', 0)->get();
         foreach ($permissions as $permission) {
             array_push($data, $permission);
             $subs = Permission::where('parent_id', $permission->id)->get();

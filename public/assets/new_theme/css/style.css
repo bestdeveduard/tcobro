@@ -10765,6 +10765,12 @@ textarea.tt-hint {
   background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
 }
 
+input:-internal-autofill-selected {
+    background-color: rgb(600, 240, 254) !important;
+    background-image: none !important;
+    color: -internal-light-dark(black, white) !important;
+}
+
 .was-validated .form-control:valid:focus, .was-validated .asColorPicker-input:valid:focus, .was-validated .dataTables_wrapper select:valid:focus, .dataTables_wrapper .was-validated select:valid:focus, .was-validated .jsgrid .jsgrid-table .jsgrid-filter-row input:valid:focus[type=text], .jsgrid .jsgrid-table .jsgrid-filter-row .was-validated input:valid:focus[type=text],
 .was-validated .jsgrid .jsgrid-table .jsgrid-filter-row select:valid:focus, .jsgrid .jsgrid-table .jsgrid-filter-row .was-validated select:valid:focus, .was-validated .jsgrid .jsgrid-table .jsgrid-filter-row input:valid:focus[type=number], .jsgrid .jsgrid-table .jsgrid-filter-row .was-validated input:valid:focus[type=number], .was-validated .select2-container--default .select2-selection--single:valid:focus, .select2-container--default .was-validated .select2-selection--single:valid:focus, .was-validated .select2-container--default .select2-selection--single .select2-search__field:valid:focus, .select2-container--default .select2-selection--single .was-validated .select2-search__field:valid:focus, .was-validated .typeahead:valid:focus,
 .was-validated .tt-query:valid:focus,
@@ -22195,22 +22201,24 @@ code {
   color: #c9c8c8;
 }
 
+/*input color*/
 .form-control, .asColorPicker-input, .dataTables_wrapper select, .jsgrid .jsgrid-table .jsgrid-filter-row input[type=text],
 .jsgrid .jsgrid-table .jsgrid-filter-row select, .jsgrid .jsgrid-table .jsgrid-filter-row input[type=number], .select2-container--default .select2-selection--single, .select2-container--default .select2-selection--single .select2-search__field, .typeahead,
 .tt-query,
 .tt-hint {
-  border: 1px solid #6e7aff;
+  border: 1px solid #f3f3f3;
   font-weight: 400;
   font-size: 0.875rem;
 }
 
+/*input select color*/
 select.form-control, select.asColorPicker-input, .dataTables_wrapper select,
 .jsgrid .jsgrid-table .jsgrid-filter-row select, .select2-container--default select.select2-selection--single, .select2-container--default .select2-selection--single select.select2-search__field, select.typeahead,
 select.tt-query,
 select.tt-hint {
   padding: .4375rem .75rem;
   border: 0;
-  outline: 1px solid #6e7aff;
+  outline: 1px solid #f3f3f3;
   color: #000000;
 }
 
@@ -26162,8 +26170,8 @@ body.avgrund-active {
 .datepicker.datepicker-inline {
   padding: 0;
   width: 30%;
-  max-width: 500px;
-  min-width: 250px;
+  max-width: 400px;
+  min-width: 150px;
 }
 
 .datepicker.datepicker-dropdown .datepicker-days,
@@ -26187,7 +26195,7 @@ body.avgrund-active {
   color: #000000;
   padding-bottom: 1rem;
   padding-top: 1rem;
-  background: #ffffff;
+  background: #000000;
 }
 
 .datepicker.datepicker-dropdown .datepicker-days table.table-condensed thead tr th.datepicker-switch,
@@ -28104,12 +28112,12 @@ div.tagsinput span.tag a {
 /* === Landing screens === */
 /* Auth */
 .auth .login-half-bg {
-  background: url("../../images/auth/login-bg.jpg");
+  background: url("https://www.t-cobro.com/elementos/c-dinero.png");
   background-size: cover;
 }
 
 .auth .register-half-bg {
-  background: url("../../images/auth/register-bg.jpg");
+  background: url("https://www.t-cobro.com/elementos/register.jpg");
   background-size: cover;
 }
 
@@ -28182,7 +28190,7 @@ div.tagsinput span.tag a {
 
 @media (min-width: 768px) {
   .auth.auth-img-bg .auth-form-transparent {
-    width: 55%;
+    width: 75%;
     margin: auto;
   }
 }
@@ -28192,7 +28200,7 @@ div.tagsinput span.tag a {
 }
 
 .auth .brand-logo img {
-  width: 150px;
+  width: 230px;
 }
 
 .auth form .form-group {

@@ -1,54 +1,58 @@
 @extends('layouts.master')
 @section('title')
-{{trans_choice('general.ledger',1)}}
+Tcobro Web | Balance de cuentas
 @endsection
 @section('content')
 <div class="card">
   <div class="card-body">
     <div class="panel-heading">
       <h3 class="panel-title">
-        {{trans_choice('general.ledger',1)}}
+        Balance de cuentas<!---{{trans_choice('general.ledger',1)}}
         @if(!empty($start_date))
         for period: <b>{{$start_date}} to {{$end_date}}</b>
-        @endif
+        @endif--->
       </h3>
 
       <div class="heading-elements">
       </div>
     </div>
     <div class="panel-body hidden-print">
-      <h4 class="">{{trans_choice('general.date',1)}} {{trans_choice('general.range',1)}}</h4>
+      <h4 class=""></h4>
       {!! Form::open(array('url' => Request::url(), 'method' => 'post','class'=>'form-horizontal', 'name' => 'form'))
       !!}
-      <div class="row">
-        <div class="col-md-2">
-          {!! Form::text('start_date',$start_date, array('class' => 'form-control date-picker', 'placeholder'=>"From
+    <div class="row">      
+        <div class="col-md-4">
+          <div class="form-group row">
+            <label class="col-sm-3 col-form-label" align="center" style="color:#22ae60;"><strong>Inicial *</strong></label>
+            <div class="col-sm-8">
+          {!! Form::date('start_date',$start_date, array('class' => 'form-control date-picker', 'placeholder'=>"From
           Date",'required'=>'required')) !!}
+            </div>
+          </div>
         </div>
-        <div class="col-md-1  text-center" style="padding-top: 15px;">
-          to
-        </div>
-        <div class="col-md-2">
-          {!! Form::text('end_date',$end_date, array('class' => 'form-control date-picker', 'placeholder'=>"To
+        <div class="col-md-4">
+          <div class="form-group row">
+            <label class="col-sm-3 col-form-label" align="center"  style="color:#22ae60;"><strong>Final *</strong></label>
+            <div class="col-sm-8">
+          {!! Form::date('end_date',$end_date, array('class' => 'form-control date-picker', 'placeholder'=>"To
           Date",'required'=>'required')) !!}
+            </div>
+          </div>
         </div>
-      </div>
-      <br>
+     </div>    
       <div class="panel-body">
         <div class="row">
           <div class="col-md-6">
             <span class="input-group-btn">
-              <button type="submit" class="btn btn-info">Buscar
-                <!---{{trans_choice('general.search',1)}}!--->
-              </button>
+          <button style="width:115px;" type="submit" class="btn btn-primary mr-2">Buscar</button>  
             </span>            
-            <span class="input-group-btn">
+            <!---<span class="input-group-btn">
               <button class="btn btn-info" onclick="window.print()">Imprimir</button>
-            </span>
-            <span class="input-group-btn">
+            </span>--->
+            <!---<span class="input-group-btn">
               <a href="{{Request::url()}}" class="btn bg-purple">Resetear                
               </a>
-            </span>
+            </span>--->
           </div>
         </div>
       </div>
@@ -62,10 +66,12 @@
 @if(!empty($start_date))
 <div class="card">
   <div class="card-body">
-    <div class="panel-body table-responsive no-padding">
-      <table class="table table-bordered table-condensed table-hover">
+    <div class="panel-body">
+    <div class="table-responsive">
+      <table id="data-table" class="table table-striped table-condensed table-hover">
         <thead>
-          <tr style="background-color: #0055AF">
+            <!--- style="background-color: #cddaff"--->
+          <tr>
             <th>{{trans_choice('general.gl_code',1)}}</th>
             <th>{{trans_choice('general.account',1)}}</th>
             <th>{{trans_choice('general.debit',1)}}</th>
@@ -82,9 +88,9 @@
           <?php
             $cr = 0;
             $dr = 0;
-            $cr = \App\Models\JournalEntry::where('account_id', $key->id)->whereBetween('date',
+            $cr = \App\Models\JournalEntry::where('account_id', $key->id)->where('branch_id', Sentinel::getUser()->business_id)->whereBetween('date',
                 [$start_date, $end_date])->sum('credit');
-            $dr = \App\Models\JournalEntry::where('account_id', $key->id)->whereBetween('date',
+            $dr = \App\Models\JournalEntry::where('account_id', $key->id)->where('branch_id', Sentinel::getUser()->business_id)->whereBetween('date',
                 [$start_date, $end_date])->sum('debit');
             $credit_total = $credit_total + $cr;
             $debit_total = $debit_total + $dr;
@@ -119,14 +125,17 @@
       </table>
     </div>
   </div>
+</div>  
 </div>
 @else
 <div class="card">
   <div class="card-body">
-    <div class="panel-body table-responsive no-padding">
-      <table class="table table-bordered table-condensed table-hover">
+    <div class="panel-body">
+        <div class="table-responsive">
+      <table class="table table-striped table-condensed">
         <thead>
-          <tr style="background-color: #D1F9FF">
+            <!--- style="background-color: #D1F9FF"--->
+          <tr style="background-color: #CDDAFF">
             <th>{{trans_choice('general.gl_code',1)}}</th>
             <th>{{trans_choice('general.account',1)}}</th>
             <th>{{trans_choice('general.debit',1)}}</th>
@@ -143,8 +152,8 @@
           <?php
             $cr = 0;
             $dr = 0;
-            $cr = \App\Models\JournalEntry::where('account_id', $key->id)->sum('credit');
-            $dr = \App\Models\JournalEntry::where('account_id', $key->id)->sum('debit');
+            $cr = \App\Models\JournalEntry::where('account_id', $key->id)->where('branch_id', Sentinel::getUser()->business_id)->sum('credit');
+            $dr = \App\Models\JournalEntry::where('account_id', $key->id)->where('branch_id', Sentinel::getUser()->business_id)->sum('debit');
             $credit_total = $credit_total + $cr;
             $debit_total = $debit_total + $dr;
             ?>
@@ -153,13 +162,13 @@
             <td>
               {{$key->name}}
             </td>
-            <td>{{ number_format($dr,2) }}</td>
-            <td>{{ number_format($cr,2) }}</td>
+            <td>${{ number_format($dr,2) }}</td>
+            <td>${{ number_format($cr,2) }}</td>
             <td>
               @if($dr>$cr)
-              {{number_format($dr-$cr,2)}} Dr
+              ${{number_format($dr-$cr,2)}} Dr
               @elseif($cr>$dr)
-              {{number_format($cr-$dr,2)}} Cr
+              ${{number_format($cr-$dr,2)}} Cr
               @else
               0
               @endif
@@ -169,18 +178,44 @@
         </tbody>
         <tfoot>
           <tr>
-            <td colspan="2"><b>{{trans_choice('general.total',1)}}</b></td>
-            <td>{{number_format($debit_total,2)}}</td>
-            <td>{{number_format($credit_total,2)}}</td>
+            <td colspan="2"><b><center><strong>{{trans_choice('general.total',1)}}</strong> </center> </b></td>
+            <td><strong>${{number_format($debit_total,2)}}</strong></td>
+            <td><strong>${{number_format($credit_total,2)}}</strong></td>
             <td></td>
           </tr>
         </tfoot>
       </table>
     </div>
   </div>
+  </div>  
 </div>
 @endif
 @endsection
 @section('footer-scripts')
-
+<script>
+$('#data-table').DataTable({
+  "order": [
+    [0, "asc"]
+  ],
+  "columnDefs": [{
+    "orderable": false,
+    "targets": []
+  }],
+  "language": {
+    "lengthMenu": "{{ trans('general.lengthMenu') }}",
+    "zeroRecords": "{{ trans('general.zeroRecords') }}",
+    "info": "{{ trans('general.info') }}",
+    "infoEmpty": "{{ trans('general.infoEmpty') }}",
+    "search": "{{ trans('general.search') }}",
+    "infoFiltered": "{{ trans('general.infoFiltered') }}",
+    "paginate": {
+      "first": "{{ trans('general.first') }}",
+      "last": "{{ trans('general.last') }}",
+      "next": "{{ trans('general.next') }}",
+      "previous": "{{ trans('general.previous') }}"
+    }
+  },
+  responsive: false
+});
+</script>
 @endsection

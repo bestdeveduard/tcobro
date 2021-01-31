@@ -33,24 +33,26 @@ class BaseController extends Controller
 
     public function create()
     {        
-        $routes = \App\Models\LoanProduct::all();        
+        $routes = \App\Models\LoanProduct::where('user_id', Sentinel::getUser()->business_id)->get();        
         $users = \App\Models\User::where('business_id', Sentinel::getUser()->business_id)->where('id', '!=', Sentinel::getUser()->id)->get();
         return view('base/create', compact('routes', 'users'));
     }
 
-    public function store()
+    public function store(Request $request)
     {
-        $route_id = Input::get('route_id');
-        $user_id = Input::get('user_id');
-        $amount = Input::get('amount');
+        $route_id = $request->route_id;
+        $user_id = $request->user_id;
+        $amount = $request->amount;
+        $note = $request->note;
 
         DB::table('tb_base')->insert([
             'route_id' => $route_id,
-            'user_id' => $$route_id,
+            'user_id' => $user_id,
             'amount' => $amount,
             'created_user' => Sentinel::getUser()->id,
             'create_at' => date('Y-m-d'),
-            'status' => 1
+            'status' => 1,
+            'note' => $note
         ]);
 
         return redirect('baseuser/data');
@@ -58,10 +60,10 @@ class BaseController extends Controller
 
     public function edit($id)
     {
-        $routes = \App\Models\LoanProduct::all();        
+        $routes = \App\Models\LoanProduct::where('user_id', Sentinel::getUser()->business_id)->get();        
         $users = \App\Models\User::where('business_id', Sentinel::getUser()->business_id)->where('id', '!=', Sentinel::getUser()->id)->get();
         $base = DB::table('tb_base')->where('id', $id)->first();
-        return view('base/edit', compact('routes', 'users', 'base'));
+        return view('base/edit', compact('routes', 'users', 'base', 'note'));
     }
 
     public function update()
@@ -69,19 +71,20 @@ class BaseController extends Controller
         $route_id = Input::get('route_id');
         $user_id = Input::get('user_id');
         $amount = Input::get('amount');
+        $note = Input::get('note');
         $id = Input::get('base_id');
 
         DB::table('tb_base')->where('id', $id)->update([
             'route_id' => $route_id,
-            'user_id' => $$route_id,
-            'amount' => $amount
+            'user_id' => $user_id,
+            'amount' => $amount,
+            'note' => $note
         ]);
         return redirect('baseuser/data');
     }
 
-    public function delete()
-    {
-        $id = Input::get('plan_id');
+    public function delete($id)
+    {        
         DB::table('tb_base')->where('id', $id)->delete();
         return redirect('baseuser/data');
     }

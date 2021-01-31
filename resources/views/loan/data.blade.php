@@ -1,11 +1,12 @@
 @extends('layouts.master')
 @section('title')
-Prestamos
+Tcobro Web | Prestamos
 @endsection
 @section('content')
+  <p align="right"><a href="{{ url('loan/create') }}" type="button" class="btn btn-primary mr-2">Crear Prestamo</a></p>
 <div class="card">
   <div class="card-body">
-
+      <h4>Prestamos</h4>
     <div class="panel-heading">
       <h2 class="panel-title">
 
@@ -35,28 +36,33 @@ Prestamos
         {{trans_choice('general.loan',2)}} {{trans_choice('general.rescheduled',1)}}
         @endif
         @else
-        Todos los prestamos
+        
         @endif
       </h2>
-      <div class="heading-elements">
+      <!---<div class="heading-elements">
         @if(Sentinel::hasAccess('loans.create'))
-        <a href="{{ url('loan/create') }}" class="btn btn-info btn-sm">{{trans_choice('general.add',1)}}
-          {{trans_choice('general.loan',1)}}</a>
+        <a href="{{ url('loan/create') }}" class="btn btn-info btn-sm">Crear Prestamo</a>
         @endif
-      </div>
+      </div>--->
     </div>
     <div class="panel-body table-responsive">
       <table id="order-listing" class="table">
         <thead>
           <tr>
-            <th>#</th>
-            <th>Nombres & apellidos</th>
+            <th>ID</th>
+            <th>Fecha</th>
+            <th>Nombre</th>
+            <th>Ruta</th>            
             <th>Capital prestado</th>
-            <th>Desembolsado</th>
-            <th>Ruta</th>
-            <th>Pagas</th>
-            <th>Ganancia</th>
-            <th>Balance</th>            
+            <!---<th>Interes</th>
+            <th>Mora</th>
+            <th>Ajustes</th>--->
+            <th>Balance</th>
+            <th>No. Cuota</th>            
+            <!---<th>Desembolsado</th>--->
+
+
+            <th>Utilidad</th>
             <th>Estatus</th>
             <th>Acciones</th>
           </tr>
@@ -66,8 +72,15 @@ Prestamos
           <tr>
             <td>{{$key->id}}</td>
             <td>
+            @if(!empty($key->disbursed_date))
+            {{$key->disbursed_date}}
+              @else
+              <label style="width: 100px;" class="badge badge-danger">No encontrada</label>
+              @endif            
+            </td>
+            <td>
               @if(!empty($key->borrower))
-              <a href="{{url('borrower/'.$key->borrower_id.'/show')}}">{{$key->borrower->first_name}}
+              <a>{{$key->borrower->first_name}}
                 {{$key->borrower->last_name}}</a>
               @else
               <span class="label label-danger">{{trans_choice('general.broken',1)}} <i
@@ -75,21 +88,36 @@ Prestamos
               @endif
             </td>
             <td>
+              @if(!empty($key->loan_product))
+              {{$key->loan_product->name}}
+              @else
+              <label style="width: 100px;" class="badge badge-danger">No encontrada</label>
+              @endif
+            </td>            
+            <td>
               @if(\App\Models\Setting::where('setting_key', 'currency_position')->first()->setting_value=='left')
               ${{number_format($key->principal,2)}}
               @else
               ${{number_format($key->principal,2)}}
               @endif
             </td>
-            <td>{{$key->release_date}}</td>
-            <td>
-              @if(!empty($key->loan_product))
-              {{$key->loan_product->name}}
-              @else
-              <span class="label label-danger">{{trans_choice('general.broken',1)}} <i
-                  class="fa fa-exclamation-triangle"></i> </span>
-              @endif
+            <!---<td>
+                INTERES 0
             </td>
+            <td>
+                MORA 0
+            </td>
+            <td>
+                AJUSTES 0
+            </td>--->
+            <td>
+            @if($key->status=='closed')
+            $0.00
+            @else
+              ${{number_format(\App\Helpers\GeneralHelper::loan_total_balance($key->id),2)}}
+            @endif  
+             </td>      
+             
             <td>
             @php
               $paid_count = 0;
@@ -151,8 +179,12 @@ Prestamos
                   $unpaid_rate = $unpaid_rate + $outstanding / $due;
               }
               @endphp
-              {{number_format($paid_rate, 2, '.', "")}} de {{$paid_count + $unpaid_count}}
+              {{number_format($paid_rate, 2, '.', "")}} de {{number_format($paid_count + $unpaid_count,2)}}
             </td>
+            
+            <!---<td>{{$key->release_date}}</td>--->
+
+
             <td>
             @php
               $total_principal = 0;
@@ -177,18 +209,11 @@ Prestamos
                   $transaction_type = $key->transaction_type;            
               }
             @endphp
-            ${{number_format($total_interest + $total_fees + $total_penalty, 2, '.', "")}}
+            ${{number_format($total_interest + $total_fees + $total_penalty, 2)}}
             </td>
             <td>
-              @if(\App\Models\Setting::where('setting_key', 'currency_position')->first()->setting_value=='left')
-              ${{number_format(\App\Helpers\GeneralHelper::loan_total_balance($key->id),2)}}
-              @else
-              ${{number_format(\App\Helpers\GeneralHelper::loan_total_balance($key->id),2)}}
-              @endif
-            </td>            
-            <td>
               @if($key->maturity_date<date("Y-m-d") && \App\Helpers\GeneralHelper::loan_total_balance($key->id)>0)
-              <span class="label label-danger">{{trans_choice('general.past_maturity',1)}}</span>
+              <label style="width: 100px;  background-color:#b71c1c;" class="badge badge-danger">Vencido</label>
               @else
                 @if($key->status=='pending')
                 <span class="label label-warning">Pendiente de aprobacion</span>
@@ -209,7 +234,7 @@ Prestamos
                 <span class="label label-danger">Llevado a perdida</span>
                 @endif
                 @if($key->status=='closed')
-                <label style="width: 100px;" class="badge badge-secondary">Closed</label>
+                <label style="width: 100px;" class="badge badge-secondary">Cancelado</label>
                 @endif
                 @if($key->status=='pending_reschedule')
                 <span class="label label-warning">{{trans_choice('general.pending',1)}}
@@ -221,6 +246,19 @@ Prestamos
               @endif
             </td>
             <td>
+        <a href="{{ url('loan/'.$key->id.'/repayment/create') }}">
+            <button style="width:110px; height:28px; background-color:#22ae60; border-color:#22ae60;" type="button" class="btn btn-success btn-icon-text">
+                Pagar
+            </button>    
+        </a>
+        <a href="{{ url('loan/'.$key->id.'/show') }}">
+            <button style="width:110px; height:28px; background-color:#4c82c3; border-color:#4c82c3;" type="button" class="btn btn-info btn-icon-text">
+                Abrir
+            </button>    
+        </a>                
+                
+            </td>
+            <!---<td>
               <ul class="icons-list">
                 <li class="dropdown">
                   <a href="#" data-toggle="dropdown">
@@ -244,7 +282,7 @@ Prestamos
                   </ul>
                 </li>
               </ul>
-            </td>
+            </td>--->
           </tr>
           @endforeach
         </tbody>

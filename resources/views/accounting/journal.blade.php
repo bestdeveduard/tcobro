@@ -1,16 +1,18 @@
 @extends('layouts.master')
 @section('title')
-{{trans_choice('general.journal',1)}} {{trans_choice('general.entry',2)}}
+Tcobro web | Diario general
 @endsection
 @section('content')
 <div class="card">
   <div class="card-body">
     <div class="panel-heading">
       <h3 class="panel-title">
-        {{trans_choice('general.journal',1)}} {{trans_choice('general.entry',2)}}
+        
+        Diario general
+        <!---{{trans_choice('general.journal',1)}} {{trans_choice('general.entry',2)}}
         @if(!empty($start_date))
         for period: <b>{{$start_date}} to {{$end_date}}</b>
-        @endif
+        @endif--->
       </h3>
 
       <div class="heading-elements">
@@ -19,32 +21,40 @@
     <div class="panel-body hidden-print">
       {!! Form::open(array('url' => Request::url(), 'method' => 'post','class'=>'form-horizontal', 'name' => 'form'))
       !!}
-      <div class="row">
+   <div class="row">      
         <div class="col-md-4">
-          {!! Form::label('start_date',trans_choice('general.start',1).'
-          '.trans_choice('general.date',1),array('class'=>'')) !!}
-          {!! Form::text('start_date',$start_date, array('class' => 'form-control date-picker',
+          <div class="form-group row">
+            <label class="col-sm-3 col-form-label" align="center" style="color:#22ae60;"><strong>Inicial *</strong></label>
+            <div class="col-sm-8">
+          {!! Form::date('start_date',$start_date, array('class' => 'form-control date-picker',
           'placeholder'=>"",'required'=>'required')) !!}
+            </div>
+          </div>
         </div>
         <div class="col-md-4">
-          {!! Form::label('end_date',trans_choice('general.end',1).'
-          '.trans_choice('general.date',1),array('class'=>'')) !!}
-          {!! Form::text('end_date',$end_date, array('class' => 'form-control date-picker',
+          <div class="form-group row">
+            <label class="col-sm-3 col-form-label" align="center"  style="color:#22ae60;"><strong>Final *</strong></label>
+            <div class="col-sm-8">
+          {!! Form::date('end_date',$end_date, array('class' => 'form-control date-picker',
           'placeholder'=>"",'required'=>'required')) !!}
+            </div>
+          </div>
         </div>
         <div class="col-md-4">
-          {!! Form::label('account_id',trans_choice('general.chart_of_account',1),array('class'=>'')) !!}
+          <div class="form-group row">
+            <label class="col-sm-3 col-form-label" align="center"  style="color:#22ae60;"><strong>Cuenta *</strong></label>
+            <div class="col-sm-8">
           {!! Form::select('account_id',$chart_of_accounts,$account_id, array('class' => 'form-control select2',
           'placeholder'=>trans_choice('general.select',1),'required'=>'required')) !!}
         </div>
       </div>
-      <br>
+     </div>
+    </div> 
       <div class="panel-body">
         <div class="row">
           <div class="col-md-12">
-            <button type="submit" class="btn btn-success">{{trans_choice('general.search',1)}}!
-            </button>
-            <a href="{{Request::url()}}" class="btn btn-danger">{{trans_choice('general.reset',1)}}!</a>
+          <button style="width:115px;" type="submit" class="btn btn-primary mr-2">Buscar</button>  
+            <!---<a href="{{Request::url()}}" class="btn btn-danger">{{trans_choice('general.reset',1)}}!</a>--->
           </div>
         </div>
       </div>
@@ -60,7 +70,7 @@
   <div class="card-body">
     <div class="panel-body ">
       <div class="table-responsive">
-        <table id="data-table" class="table table-striped table-condensed table-hover">
+        <table id="data-table" class="table table-striped table-condensed">
           <thead>
             <tr>
               <th>#</th>
@@ -136,8 +146,8 @@
                 {{ $key->chart->name }}
                 @endif
               </td>
-              <td>{{ number_format($key->debit,2) }}</td>
-              <td>{{ number_format($key->credit,2) }}</td>
+              <td>${{ number_format($key->debit,2) }}</td>
+              <td>${{ number_format($key->credit,2) }}</td>
             </tr>
             @endforeach
           </tbody>

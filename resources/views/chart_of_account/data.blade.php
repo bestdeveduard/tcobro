@@ -1,19 +1,17 @@
 @extends('layouts.master')
 @section('title')
-{{trans_choice('general.chart_of_account',2)}}
+T-Cobro Web|Catalogo de cuentas
 @endsection
 @section('content')
+  <p align="right"><a href="{{ url('chart_of_account/create') }}" type="button" class="btn btn-primary mr-2">Crear Cuenta</a></p>  
 <div class="card">
   <div class="card-body">
     <div class="panel-heading">
-      <h2> {{trans_choice('general.chart_of_account',2)}}</h2>
+      <h4>Catalogo de cuentas</h4>
 
       <div class="heading-elements">
         @if(Sentinel::hasAccess('capital.create'))
-        <a href="{{ url('chart_of_account/create') }}" class="btn btn-info btn-sm">
-          <!---{{trans_choice('general.add',1)}} {{trans_choice('general.chart_of_account',1)}}--->Agregar cuenta
-          contable
-        </a>
+
         @endif
       </div>
     </div>
@@ -22,19 +20,20 @@
         <table id="order-listing" class="table">
           <thead>
             <tr>
-              <th>{{trans_choice('general.gl_code',1)}}</th>
-              <th>{{trans_choice('general.name',1)}}</th>
-              <th>{{trans_choice('general.type',1)}}</th>
-              <th>{{trans_choice('general.note',2)}}</th>
-              <th>{{ trans_choice('general.action',1) }}</th>
+              <th style="width:5px";><center>Codigo</center></th>
+              <th><center>Nombre</center></th>
+              <th><center>Descripcion</center></th>
+              <th><center>Tipo</center></th>              
+              <th style="width:15px";><center>Acciones</center></th>
             </tr>
           </thead>
           <tbody>
             @foreach($data as $key)
             <tr>
-              <td>{{ $key->gl_code }}</td>
-              <td>{{ $key->name }}</td>
-              <td>
+              <td><center>{{ $key->gl_code }}</center></td>
+              <td><center>{{ $key->name }}</center></td>
+              <td><center>{!! $key->notes !!}</center></td>              
+              <td><center>
                 @if($key->account_type=="expense")
                 {{trans_choice('general.expense',1)}}
                 @endif
@@ -50,13 +49,17 @@
                 @if($key->account_type=="income")
                 {{trans_choice('general.income',1)}}
                 @endif
-              </td>
-              <td>{!! $key->notes !!}</td>
+              </center></td>
               <td>
-                <a href="{{ url('chart_of_account/'.$key->id.'/edit') }}"><img
-                    src="https://img.icons8.com/cute-clipart/64/000000/edit.png" /></a>
-                <a href="{{ url('chart_of_account/'.$key->id.'/delete') }}"><img
-                    src="https://img.icons8.com/flat_round/64/000000/delete-sign.png" /></a>
+                <a href="{{ url('chart_of_account/'.$key->id.'/edit') }}">
+                        <button style="width:110px; height:28px; background-color:#4c82c3; border-color:#4c82c3;" type="button" class="btn btn-info btn-icon-text">
+                            Editar </button>               
+                </a>
+                <a href="{{ url('chart_of_account/'.$key->id.'/delete') }}" class="delete">
+                      <button style="width:110px; height:28px; background-color:#de3501; border-color:#de3501;"  type="button" class="btn btn-danger btn-icon-text">
+                          Eliminar
+                        </button>          
+                </a>
               </td>
             </tr>
             @endforeach

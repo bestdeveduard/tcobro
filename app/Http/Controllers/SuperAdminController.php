@@ -37,8 +37,10 @@ class SuperAdminController extends Controller
         $data = array();
         foreach($users as $user) {
             if($user->roles->first()->id == $role->id) {
-                $country_name = DB::table('countries')->where('id', $user->country_id)->first()->name;
-                $user->country_name = $country_name;
+                if ($user->country_id) {
+                    $country_name = DB::table('countries')->where('id', $user->country_id)->first()->name;
+                    $user->country_name = $country_name;
+                }
                 $data[] = $user;
             }
         }
@@ -155,6 +157,13 @@ class SuperAdminController extends Controller
             $u->plan_expired_date = date_format(date_add(date_create(date('Y-m-d')), date_interval_create_from_date_string($plans->duration.' days')), 'Y-m-d');;
             $u->save();
 
+            DB::table('branch_users')->insert([
+                'branch_id' => 1,
+                'user_id' => $user->id,
+                'created_at' => date('Y-m-d h:i:s'),
+                'updated_at' => date('Y-m-d h:i:s')
+            ]);
+
             GeneralHelper::audit_trail("Usuario eliminado ID:" . $user->id);
             Flash::success("Procesado exitosamente");
             return redirect('super_admin/admin');
@@ -203,8 +212,8 @@ class SuperAdminController extends Controller
         return redirect('super_admin/plans');
     }
 
-    public function deletePlan() {
-        DB::table('plans')->where('id', Input::get('plan_id'))->delete();
+    public function deletePlan($id) {
+        DB::table('plans')->where('id', $id)->delete();
         return redirect('super_admin/plans');
     }
 }

@@ -29,7 +29,7 @@
       } else {
         //for other url
         // element.addClass('active');
-        if (element.attr('href').indexOf(current + '/') !== -1 || ((element.attr('href').indexOf(current + '/') !== -1 || element.attr('href').indexOf(current) !== -1) && element.attr('href').indexOf(current1) !== -1)) {
+        if (element.attr('href').indexOf(current + '/' + current1) !== -1) {
           element.parents('.nav-item').last().addClass('active');
           element.parents('.nav-item').last()[0].firstElementChild.setAttribute('aria-expanded', 'true');          
           if (element.parents('.sub-menu').length) {
